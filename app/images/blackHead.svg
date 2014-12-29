@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<svg width="302" height="288" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <defs>
+  <linearGradient y2="0" x2="1" y1="0" x1="0" id="svg_1">
+   <stop offset="0" stop-opacity="0" stop-color="#0f0f00"/>
+   <stop offset="0.605469" stop-opacity="0.996094" stop-color="#000000"/>
+  </linearGradient>
+  <linearGradient id="svg_20">
+   <stop offset="0" stop-opacity="0.996094" stop-color="#7791c6"/>
+   <stop offset="1" stop-opacity="0.996094" stop-color="#2c35a3"/>
+  </linearGradient>
+  <linearGradient y2="0" x2="0" y1="1" x1="0" id="svg_21">
+   <stop offset="0" stop-opacity="0.996094" stop-color="#7791c6"/>
+   <stop offset="1" stop-opacity="0.996094" stop-color="#2c35a3"/>
+  </linearGradient>
+  <linearGradient y2="0" x2="0" y1="0" x1="1" id="svg_22">
+   <stop offset="0" stop-opacity="0.996094" stop-color="#7791c6"/>
+   <stop offset="1" stop-opacity="0.996094" stop-color="#2c35a3"/>
+  </linearGradient>
+ </defs>
+ <g>
+  <title>Layer 1</title>
+  <path d="m32.007774,143c7.000015,74 8.000015,95 11.000008,105c3,10 96,39 99,39c3,0 79.000031,-31 80.000031,-36c1,-5 18,-30 25,-37c7,-7 8,-6 18,-16c10.000031,-10 6.000031,-23 6.000031,-36c0,-13 -12.000031,-8 -19.000031,-8c-7,0 -22.999969,-84 -36,-83c-13,1 -123.000008,-3 -129.000015,-2c-6.000008,1 -3.000008,-9 -10.000015,-2c-7.000015,7 -52.000017,2 -45.000008,76z" id="svg_4" stroke-width="1.5" stroke="#0f0f00" fill="#fff5ed"/>
+  <path id="svg_5" d="m123.007805,253c17.999977,3 39.000008,1 44.000008,-3" stroke-opacity="null" stroke-width="1.5" stroke="#0f0f00" fill="#fff5ed"/>
+  <path id="svg_9" d="m163.007813,166.5c14,-10 18,-15 39,-15c21,0 34.000031,10 34.000031,13" fill-opacity="null" stroke-opacity="null" stroke-width="4" stroke="#0f0f00" fill="#fff5ed"/>
+  <path id="svg_10" d="m163.007813,166.5c14,-10 18,-15 39,-15c21,0 34.000031,10 34.000031,13" fill-opacity="null" stroke-opacity="null" stroke-width="4" stroke="#0f0f00" fill="#fff5ed"/>
+  <path id="svg_11" d="m45.007782,169.5c13.999985,-10 17.999985,-15 39.000008,-15c21.000015,0 34.000015,10 34.000015,13" fill-opacity="null" stroke-opacity="null" stroke-width="4" stroke="#0f0f00" fill="#fff5ed"/>
+  <path id="svg_16" d="m2.007781,69" opacity="0.5" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" stroke="#0f0f00" fill="#fff5ed"/>
+  <path stroke="#0f0f00" id="svg_17" d="m7.757781,131.866058c2.99997,65 4.99997,74 4.99997,72c0,-2 8.999999,-53 8.999999,-54c0,-1 9.000008,40 8.000008,37c-1.000008,-3 28.00001,-62 28.00001,-62c0,0 45.000031,-17 45.000031,-13c0,4 -5.000015,31 -3.000015,28c2.000015,-3 29,-23 29,-23c0,0 68.999969,-4 68.999969,-2c0,2 38,20 38,22c0,2 -16.999969,28 -16.999969,28c0,0 9.999969,-5 9.999969,-5c0,0 -7.999969,24 -7.999969,24c0,0 21,-3 38.000031,-14c16.999969,-11 16.999969,-25 16.999969,-25c0,0 25.999969,3 25.999969,2c0,-1 -32.999969,-60 -32.999969,-59c0,1 -10.999969,-65.000015 -64.000031,-80.000015c-52.999969,-15.000015 -87.999954,-2.999985 -119.999954,6.000015c-32.000046,9 -62.000048,50 -69.000047,69c-7,19 -10.99997,-16 -7.99997,49z" stroke-opacity="null" stroke-width="1.5" fill="#000000"/>
+ </g>
+</svg>
