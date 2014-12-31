@@ -50,10 +50,32 @@ var GridModel = Backbone.Model.extend({
 	attemptMovement: function(srcTile, destTile){
 		var piece = this.getTile(srcTile);
 		if (piece instanceof Ally){
-			this.setTile(null, srcTile);		// Clear current space.
-			this.setTile(piece, destTile);		// Move piece to dest.
+			if (this.tileDistance(srcTile, destTile) <= piece.moveRange){
+				this.setTile(null, srcTile);		// Clear current space.
+				this.setTile(piece, destTile);		// Move piece to dest.
 
-			// piece.moveTo(destTile.x, destTile.y);
+				piece.moved = true;
+				// piece.moveTo(destTile.x, destTile.y);
+		
+				return true;
+			}
 		}
+
+		return false;
+	},
+
+	/**
+	 * Computes the Manhattan distance between two tiles.
+	 * 
+	 * @param  {Object} srcTile  The first tile.
+	 * @param  {Object} destTile The second tile.
+	 * 
+	 * @return {Number}          The distance between the two tiles.
+	 */
+	tileDistance: function (srcTile, destTile){
+		var xDist = Math.abs(destTile.x - srcTile.x);
+		var yDist = Math.abs(destTile.y - srcTile.y);
+
+		return xDist+yDist;
 	}
 });

@@ -7,12 +7,9 @@ function SelectionManager (options){
 	this.gridView = options.gridView;
 	this.gridModel = this.gridView.gridModel;
 	this.cursor = this.gridView.cursor;
-	this.selectBox = this.gridView.selectBox;
-	this.startBox = this.gridView.startBox;
-	this.endBox = this.gridView.endBox;
-	this.path = this.gridView.path;
 	this.cellWidth = this.gridView.cellWidth;
 	this.cellHeight = this.gridView.cellHeight;
+	this.setupSelectionGraphics(this.gridView.pixiContainer);
 
 	this.topMenu = document.getElementById('topMenu');
 
@@ -28,12 +25,33 @@ function SelectionManager (options){
 }
 
 _.extend(SelectionManager.prototype, {
+	/**
+	 * Setup drawable graphics for the Selection Manager to use.
+	 */
+	setupSelectionGraphics: function (pixiContainer){
+		this.selectBox = new Box(0xbada55, this.cellWidth - 30, this.cellHeight - 30);
+		this.startBox = new Box(0x008cff, this.cellWidth - 30, this.cellHeight - 30);
+		this.endBox = new Box(0xff6600, this.cellWidth - 30, this.cellHeight - 30);
+		this.targetBox = new Box(0xff0100, this.cellWidth - 30, this.cellHeight - 30);
+		this.path = new PIXI.Graphics();
+		this.path.lineStyle(2, 0xffffff, 1);
+
+		pixiContainer.addChild(this.cursor.graphics);
+		pixiContainer.addChild(this.selectBox);
+		pixiContainer.addChild(this.startBox);
+		pixiContainer.addChild(this.endBox);
+		pixiContainer.addChild(this.targetBox);
+		pixiContainer.addChild(this.path);
+	},
+
 	onKeyUp: function(e){
 		if (Key.matches(e.keyCode, ['ENTER', 'SPACE'])){
-			if (this.selectMode === SelectionManager.MODE.STARTED){
-				this.setEnd();
-			} else {
+			if (this.selectMode === SelectionManager.MODE.NONE){
 				this.setStart();
+			} else if (this.selectMode === SelectionManager.MODE.STARTED){
+				this.setEnd();
+			} else if (this.selectMode === SelectionManager.MODE.TARGET){
+				this.setTarget();
 			}
 		}
 	},
@@ -72,40 +90,45 @@ _.extend(SelectionManager.prototype, {
 	},
 
 	setStart: function(){
-		var selectBox = this.selectBox;
-		this.selectedTile = this.getTileFromPosition(selectBox.position);
-		
+		this.clearPath();
+
 		// Return if the current tile has no piece.
-		if (!this.gridModel.getTile(this.selectedTile)){
+		var currentTile = this.getCurrentTile();
+		if (!this.gridModel.getTile(currentTile)){
 			return;
 		}
 
-		var startBox = this.startBox;
-		this.pathPoints = [];
-		this.path.clear();
+		// Show the movment/target range highlights.
+		this.gridView.showCharacterRange(currentTile);
 
-		startBox.position.set(selectBox.position.x, selectBox.position.y);
+		var selectBox = this.selectBox;
+		this.startBox.position.set(selectBox.position.x, selectBox.position.y);
+		this.selectedStartTile = currentTile;
 		this.selectMode = SelectionManager.MODE.STARTED;
 	},
 
 	setEnd: function(){
-		var endBox = this.endBox;
 		var selectBox = this.selectBox;
-
-		endBox.position.set(selectBox.position.x, selectBox.position.y);
-		this.selectMode = SelectionManager.MODE.ENDED;
-		
 		var currentTile = this.getCurrentTile();
-		this.gridView.movePiece(this.selectedTile, currentTile);
 		
-		// Audio.playJourney(11, 2);
+		this.endBox.position.set(selectBox.position.x, selectBox.position.y);
+		this.gridView.movePiece(this.selectedStartTile, currentTile);
+		this.selectMode = SelectionManager.MODE.TARGET;
 		Audio.play(1, 0.3);
+	},
+
+	setTarget: function(){
+		var selectBox = this.selectBox;
+		var currentTile = this.getCurrentTile();
+		
+		this.targetBox.position.set(selectBox.position.x, selectBox.position.y);
+		this.gridView.attackPiece(this.selectedStartTile, currentTile);
+		this.selectMode = SelectionManager.MODE.NONE;
+		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
 	updatePath: function(){
 		if (this.selectMode == SelectionManager.MODE.STARTED){
-			// this.updateSelectBox();
-
 			var pathPoints = this.pathPoints;
 			var path = this.path;
 			var currPos = this.getGridSnapPosition(this.selectBox.position);
@@ -126,6 +149,11 @@ _.extend(SelectionManager.prototype, {
 				}
 			}
 		}
+	},
+
+	clearPath: function (){
+		this.pathPoints = [];
+		this.path.clear();
 	},
 
 	getCurrentTile: function (){

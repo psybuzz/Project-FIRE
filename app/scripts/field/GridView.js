@@ -64,33 +64,19 @@ var GridView = Backbone.View.extend({
 
 		// Render graphics to the grid.
 		this.render();
-		this.setupSelectionGraphics();
-		this.selectionManager = new SelectionManager({gridView: this});
-	},
-
-	/**
-	 * Setup drawable graphics for the Selection Manager to use.
-	 */
-	setupSelectionGraphics: function (){
+		this.rangeHighlighter = new RangeHighlighter({gridView: this});
 		this.cursor = new Cursor();
-		this.selectBox = new Box(0xbada55, this.cellWidth - 30, this.cellHeight - 30);
-		this.startBox = new Box(0x008cff, this.cellWidth - 30, this.cellHeight - 30);
-		this.endBox = new Box(0xff6600, this.cellWidth - 30, this.cellHeight - 30);
-		this.path = new PIXI.Graphics();
-		this.path.lineStyle(2, 0xffffff, 1);
-
-		this.pixiContainer.addChild(this.cursor.graphics);
-		this.pixiContainer.addChild(this.selectBox);
-		this.pixiContainer.addChild(this.startBox);
-		this.pixiContainer.addChild(this.endBox);
-		this.pixiContainer.addChild(this.path);
+		this.selectionManager = new SelectionManager({gridView: this});
+		this.addCharacters();
 	},
 
 	render: function (){
 		// Create drawable graphics.
 		this.grid = new Grid(this.rowN, this.colN, this.cellWidth, this.cellHeight);
 		this.pixiContainer.addChild(this.grid);
+	},
 
+	addCharacters: function (){
 		// Make NPC's.
 		var allyN = 3, enemyN = 10;
 		var allies = [], enemies = [];
@@ -128,20 +114,36 @@ var GridView = Backbone.View.extend({
 			// Jump to.
 			// this.piece.position.set(stagePosition.x, stagePosition.y);
 
-			// Animate.
-			this.animQueue.push({
-				piece: piece,
-				destX: stagePosition.x,
-				destY: stagePosition.y,
-				dx: (stagePosition.x - piece.position.x) / 300,
-				dy: (stagePosition.y - piece.position.y) / 300,
-				right: stagePosition.x > piece.position.x,
-				down: stagePosition.y > piece.position.y,
-			});
-
+			// First check that the gridmodel accepts the movment before actual
+			// animation.
+			// 
 			// Only overwrite destination if the source is non-empty.
-			this.gridModel.attemptMovement(srcTile, destTile);
+			var canMove = this.gridModel.attemptMovement(srcTile, destTile);
+			
+			if (canMove){
+				// Animate.
+				this.animQueue.push({
+					piece: piece,
+					destX: stagePosition.x,
+					destY: stagePosition.y,
+					dx: (stagePosition.x - piece.position.x) / 300,
+					dy: (stagePosition.y - piece.position.y) / 300,
+					right: stagePosition.x > piece.position.x,
+					down: stagePosition.y > piece.position.y,
+				});
+			}
 		}
+	},
+
+	attackPiece: function (srcTile, destTile){
+		
+	},
+
+	showCharacterRange: function (currentTile){
+		var character = this.gridModel.getTile(currentTile);
+		if (!character) return;
+
+		this.rangeHighlighter.highlight(character, currentTile);
 	},
 
 	update: function (delta){
