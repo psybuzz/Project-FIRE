@@ -50,7 +50,7 @@ var GridModel = Backbone.Model.extend({
 	attemptMovement: function(srcTile, destTile){
 		var piece = this.getTile(srcTile);
 		if (piece instanceof Ally){
-			if (this.tileDistance(srcTile, destTile) <= piece.moveRange){
+			if (GridModel.tileDistance(srcTile, destTile) <= piece.moveRange){
 				this.setTile(null, srcTile);		// Clear current space.
 				this.setTile(piece, destTile);		// Move piece to dest.
 
@@ -62,20 +62,22 @@ var GridModel = Backbone.Model.extend({
 		}
 
 		return false;
-	},
-
-	/**
-	 * Computes the Manhattan distance between two tiles.
-	 * 
-	 * @param  {Object} srcTile  The first tile.
-	 * @param  {Object} destTile The second tile.
-	 * 
-	 * @return {Number}          The distance between the two tiles.
-	 */
-	tileDistance: function (srcTile, destTile){
-		var xDist = Math.abs(destTile.x - srcTile.x);
-		var yDist = Math.abs(destTile.y - srcTile.y);
-
-		return xDist+yDist;
 	}
 });
+
+// Define static class methods.
+// 
+/**
+ * Computes the Manhattan distance between two tiles.
+ * 
+ * @param  {Object} srcTile  The first tile.
+ * @param  {Object} destTile The second tile.
+ * 
+ * @return {Number}          The distance between the two tiles.
+ */
+GridModel.tileDistance = function (srcTile, destTile){
+	var xDist = Math.abs(destTile.x - srcTile.x);
+	var yDist = Math.abs(destTile.y - srcTile.y);
+
+	return xDist+yDist;
+}

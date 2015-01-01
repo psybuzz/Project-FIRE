@@ -87,9 +87,9 @@ function Grid (rowN, colN, cellWidth, cellHeight){
 
 			// Filled square.
 			grid.lineStyle(0);
-			var r = Math.floor(Math.random()*20+127);
-			var g = Math.floor(Math.random()*20+127);
-			var b = Math.floor(Math.random()*20+127);
+			var r = Math.floor(Math.random()*5+127);
+			var g = Math.floor(Math.random()*5+127);
+			var b = Math.floor(Math.random()*5+127);
 			grid.beginFill(Utils.rgbToHex(r,g,b));
 			grid.moveTo(gx, gy);
 			grid.lineTo(gx+cellWidth, gy);
@@ -101,6 +101,42 @@ function Grid (rowN, colN, cellWidth, cellHeight){
 	}
 
 	return grid;
+}
+
+/**
+ * Makes a corner-box graphic with the specified color.
+ * 
+ * @param {Color} color 	The color of the box.
+ * 
+ * @return {PIXI.Graphics} 	The box graphic.
+ */
+function CornerBox (color, w, h){
+	if (typeof color === 'undefined') color = 0xbada55;
+	var size = 20;
+	var padding = 10;
+	var length = 8;
+	w = w || size;
+	h = h || size;
+
+	var box = new PIXI.Graphics();
+	box.lineStyle(3, color, 1);
+	box.moveTo(length+padding, padding);
+	box.lineTo(padding, padding);
+	box.lineTo(padding, length+padding);
+
+	box.moveTo(w-length-padding, padding);
+	box.lineTo(w-padding, padding);
+	box.lineTo(w-padding, length+padding);
+
+	box.moveTo(padding, h-length-padding);
+	box.lineTo(padding, h-padding);
+	box.lineTo(length+padding, h-padding);
+
+	box.moveTo(w-length-padding, h-padding);
+	box.lineTo(w-padding, h-padding);
+	box.lineTo(w-padding, h-length-padding);
+
+	return box;
 }
 
 /**

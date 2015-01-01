@@ -64,9 +64,9 @@ var GridView = Backbone.View.extend({
 
 		// Render graphics to the grid.
 		this.render();
-		this.rangeHighlighter = new RangeHighlighter({gridView: this});
 		this.cursor = new Cursor();
 		this.selectionManager = new SelectionManager({gridView: this});
+		this.rangeHighlighter = new RangeHighlighter({gridView: this});
 		this.addCharacters();
 	},
 
@@ -137,13 +137,6 @@ var GridView = Backbone.View.extend({
 
 	attackPiece: function (srcTile, destTile){
 		
-	},
-
-	showCharacterRange: function (currentTile){
-		var character = this.gridModel.getTile(currentTile);
-		if (!character) return;
-
-		this.rangeHighlighter.highlight(character, currentTile);
 	},
 
 	update: function (delta){

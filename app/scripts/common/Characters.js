@@ -23,7 +23,7 @@ NPC.prototype.constructor = function (options){
 	this.name = Utils.randomName();
 
 	this.moved = false;
-	this.moveRange = Math.floor(Math.random()*5)+3;
+	this.moveRange = Math.floor(Math.random()*3)+3;
 	this.attackRange = Math.floor(Math.random()*2)+1;
 }
 

@@ -53,7 +53,9 @@ _.extend(SelectionManager.prototype, {
 			} else if (this.selectMode === SelectionManager.MODE.TARGET){
 				this.setTarget();
 			}
-		}
+		} else if (Key.matches(e.keyCode, ['SLASH'])){
+				this.resetSelection();
+		}	
 	},
 
 	update: function (){
@@ -89,42 +91,73 @@ _.extend(SelectionManager.prototype, {
 		}
 	},
 
-	setStart: function(){
+	setStart: function (){
 		this.clearPath();
 
 		// Return if the current tile has no piece.
 		var currentTile = this.getCurrentTile();
-		if (!this.gridModel.getTile(currentTile)){
-			return;
+		var selectBox = this.selectBox;
+		if (this.gridModel.getTile(currentTile)){
+			this.startBox.position.set(selectBox.position.x, selectBox.position.y);
+			this.selectedStartTile = currentTile;
+			this.selectMode = SelectionManager.MODE.STARTED;
 		}
 
-		// Show the movment/target range highlights.
-		this.gridView.showCharacterRange(currentTile);
-
-		var selectBox = this.selectBox;
-		this.startBox.position.set(selectBox.position.x, selectBox.position.y);
-		this.selectedStartTile = currentTile;
-		this.selectMode = SelectionManager.MODE.STARTED;
+		// Signal this event to subscribers.
+		this.trigger('selection:start', currentTile);
 	},
 
-	setEnd: function(){
+	setEnd: function (){
 		var selectBox = this.selectBox;
 		var currentTile = this.getCurrentTile();
-		
-		this.endBox.position.set(selectBox.position.x, selectBox.position.y);
-		this.gridView.movePiece(this.selectedStartTile, currentTile);
-		this.selectMode = SelectionManager.MODE.TARGET;
-		Audio.play(1, 0.3);
+		var startTile = this.selectedStartTile;
+		var startCharacter = startTile && this.gridModel.getTile(startTile);
+		var moveRange = startCharacter && startCharacter.moveRange;
+		var tileDist = GridModel.tileDistance(startTile, currentTile);
+
+		// Trigger an End event only when we choose an end within the selected
+		// character's movement range.
+		if (moveRange && tileDist <= moveRange){
+			this.endBox.position.set(selectBox.position.x, selectBox.position.y);
+			this.gridView.movePiece(startTile, currentTile);
+			this.selectMode = SelectionManager.MODE.TARGET;
+			
+			// Signal this event to subscribers.
+			this.trigger('selection:end', currentTile);
+			Audio.play(1, 0.3);
+		} else {
+			// If we tried to move outside the range, reset selection.
+			this.resetSelection();
+		}
+
 	},
 
-	setTarget: function(){
+	setTarget: function (){
 		var selectBox = this.selectBox;
 		var currentTile = this.getCurrentTile();
 		
 		this.targetBox.position.set(selectBox.position.x, selectBox.position.y);
 		this.gridView.attackPiece(this.selectedStartTile, currentTile);
 		this.selectMode = SelectionManager.MODE.NONE;
+		
+		// Signal this event to subscribers.
+		this.trigger('selection:target', currentTile);
 		Audio.playSrc('sounds/click3.wav', 0.3);
+	},
+
+	// The event when the player cancels selection by selecting an out-of-range
+	// tile.
+	resetSelection: function (){
+		var selectBox = this.selectBox;
+		var currentTile = this.getCurrentTile();
+
+		this.targetBox.position.set(selectBox.position.x, selectBox.position.y);
+		this.selectMode = SelectionManager.MODE.NONE;
+
+		this.clearPath();
+
+		// Signal this event to subscribers.
+		this.trigger('selection:reset', currentTile);
 	},
 
 	updatePath: function(){

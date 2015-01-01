@@ -22,8 +22,20 @@ var Key = {
 		A: 65,
 		S: 83,
 		D: 68,
+		BACKSPACE: 8,
 		ENTER: 13,
-		SPACE: 32
+		SPACE: 32,
+		ESC: 27,
+		COMMA: 188,
+		PERIOD: 190,
+		SLASH: 191,
+		L_SQ_BRACKET: 219,
+		R_SQ_BRACKET: 221,
+		NUM1: 49,
+		NUM2: 50,
+		NUM3: 51,
+		NUM4: 52,
+		NUM5: 53
 	},
 
 	isDown: function(keyCode){
@@ -33,14 +45,14 @@ var Key = {
 	anyDown: function(){
 		var p = this.pressed;
 		var map = this.keycodeMap;
-		return p[map['LEFT']] ||
-				p[map['UP']] ||
-				p[map['DOWN']] ||
-				p[map['RIGHT']] ||
-				p[map['W']] ||
-				p[map['A']] ||
-				p[map['S']] ||
-				p[map['D']];
+		var keys = Object.keys(map);
+		for (var i=0; i<keys.length; i++){
+			if (p[map[keys[i]]] === true){
+				return true;
+			}
+		}
+
+		return false;
 	},
 
 	onKeyDown: function(e){
