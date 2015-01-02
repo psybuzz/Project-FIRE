@@ -55,24 +55,21 @@ var GridView = Backbone.View.extend({
 		// Setup the PIXI Renderer.
 		var w = window.innerWidth, h = window.innerHeight-4;
 		this.renderer = PIXI.autoDetectRenderer(w, h);
-		this.el = this.renderer.view;
 		window.onresize = this.onResize.bind(this);
 
 		// Create a grid model.
 		this.gridModel = new GridModel({rowN: this.rowN, colN: this.colN});
-
-		// Render graphics to the grid.
-		this.render();
-		this.cursor = new Cursor();
-		this.selectionManager = new SelectionManager({gridView: this});
-		this.rangeHighlighter = new RangeHighlighter({gridView: this});
-		this.addCharacters();
 	},
 
 	render: function (){
 		// Create drawable graphics.
 		this.grid = new Grid(this.rowN, this.colN, this.cellWidth, this.cellHeight);
 		this.pixiContainer.addChild(this.grid);
+
+		this.cursor = new Cursor();
+		this.selectionManager = new SelectionManager({gridView: this});
+		this.rangeHighlighter = new RangeHighlighter({gridView: this});
+		this.addCharacters();
 	},
 
 	addCharacters: function (){

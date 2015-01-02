@@ -18,27 +18,34 @@ var FieldView = Backbone.View.extend({
 		this.chatView = new ChatView();
 		this.battleView = new BattleView();
 		this.gridView = new GridView();
+		this.gridView.render();
+
 		this.stage = this.gridView.stage;
 		this.renderer = this.gridView.renderer;
 		this.selectionManager = this.gridView.selectionManager;
 
 		// Set the first turn to the player by default.
 		this.turn = options.firstTurn || FieldView.TURN.PLAYER;
+		this.addedPIXIView = false;
 
 		// Bind repeated functions.
 		this.animateBound_ = this.animate.bind(this);
-		this.render();
 	},
 
 	render: function (){
 		// Add the PIXI renderer to the page.
-		this.el.appendChild(this.renderer.view);
+		if (!this.addedPIXIView){
+			this.el.appendChild(this.renderer.view);
+			this.addedPIXIView = true;
+		}
 
 		// Start animating.
 		this.animateBound_();
 	},
 
-	enterView: function (lastView){},
+	enterView: function (lastView){
+		this.render();
+	},
 
 	leaveView: function (newView){},
 
