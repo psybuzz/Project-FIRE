@@ -8,9 +8,12 @@
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
+    <!-- Old Browser Compatibility -->
     <!--[if lt IE 10]>
         <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
+
+    <!-- Main Content -->
     <div class="container" id="introContainer"></div>
     <div class="container" id="menuContainer"></div>
     <div class="container" id="fieldContainer">
@@ -22,10 +25,23 @@
         <img id="speakerProfile" src="images/redHead.svg"></img>
     </div>
     <div id="poster">Begin!</div>
+    <div id="corner">
+        <p>Dark Hour</p>
+    </div>
+
+    <!-- Audio Tags -->
     <audio id="sound1" src="sounds/click1.wav"></audio>
     <audio id="sound2" src="sounds/select1.wav"></audio>
     <audio id="dynamicSound" src=""></audio>
 
+    <!-- Client-side HTML Templates -->
+    <script type="text/template" id="actionMenuTemplate">
+        <div class="actionMenu">
+            
+        </div>
+    </script>
+
+    <!-- Scripts -->
     <script src="scripts/vendor/vendor-all-min.js"></script>
 
     <script src="scripts/utilities/Audio.js"></script>

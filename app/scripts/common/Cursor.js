@@ -15,8 +15,11 @@ function Cursor (options){
 	graphics.drawCircle(30,55,20);
 	graphics.endFill();
 
+	// The cursor's internal velocity.
 	this.dx = 0;
 	this.dy = 0;
+
+	// The cursor's max velocity when moving.
 	this.maxDx = 10;
 	this.maxDy = 10;
 

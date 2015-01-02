@@ -1,5 +1,26 @@
 
-Sounds:
+______________________________
+Libraries
+
+JQuery 2.1.1
+http://code.jquery.com/jquery-2.1.1.min.js
+
+Underscore 1.7.0
+http://underscorejs.org/underscore-min.js
+
+Backbone 1.1.2
+http://backbonejs.org/backbone-min.js
+
+Tween r15dev
+https://github.com/sole/tween.js
+
+Pixi v2
+https://github.com/GoodBoyDigital/pixi.js
+
+
+
+______________________________
+Sounds
 
 http://www.freesound.org/people/RICHERlandTV/sounds/216089/
 http://www.freesound.org/people/Northern_Monkey/sounds/176741/

@@ -39,7 +39,7 @@ _.extend(RangeHighlighter.prototype, {
 	},
 
 	onSelectionTarget: function (tile){
-
+		this.overlay.clear();
 	},
 
 	onSelectionReset: function (tile){

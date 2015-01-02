@@ -58,10 +58,11 @@ var FieldView = Backbone.View.extend({
 
 		// Update state.
 		this.update(delta);
+		TWEEN.update(time);
 
 		// Render the stage and repeat the animation loop.
 		this.renderer.render(this.stage);
-		requestAnimFrame(this.animateBound_);
+		requestAnimationFrame(this.animateBound_);
 	},
 
 	update: function (delta){

@@ -86,16 +86,14 @@ function Grid (rowN, colN, cellWidth, cellHeight){
 
 
 			// Filled square.
-			grid.lineStyle(0);
-			var r = Math.floor(Math.random()*5+127);
-			var g = Math.floor(Math.random()*5+127);
-			var b = Math.floor(Math.random()*5+127);
-			grid.beginFill(Utils.rgbToHex(r,g,b));
-			grid.moveTo(gx, gy);
-			grid.lineTo(gx+cellWidth, gy);
-			grid.lineTo(gx+cellWidth, gy+cellHeight);
-			grid.lineTo(gx, gy+cellHeight);
-			grid.endFill();
+			// grid.lineStyle(0);
+			// var r = Math.floor(Math.random()*20+127);
+			// var g = Math.floor(Math.random()*20+127);
+			// var b = Math.floor(Math.random()*-10+127);
+			// var padding = 5;
+			// grid.beginFill(Utils.rgbToHex(r,g,b));
+			// grid.drawRect(gx+padding, gy+padding, cellWidth-padding, cellHeight-padding);
+			// grid.endFill();
 			
 		}
 	}

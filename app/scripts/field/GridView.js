@@ -16,18 +16,17 @@ var GridView = Backbone.View.extend({
 	gridModel: null,
 
 	/**
-	 * The PIXI stage.
-	 * @type {PIXI.Stage}
+	 * The PIXI stage and renderer.
+	 * @type {PIXI.Stage, PIXI.Renderer}
 	 */
-	stage: null,
+	stage: null, renderer: null,
 
 	/**
-	 * This PIXI renderer.
-	 * @type {PIXI.Renderer}
+	 * The cursor for selecting tiles, selection manager for selection logic,
+	 * and range highlighter for indicating movement/attack range.
+	 * @type {Cursor, SelectionManager, RangeHighlighter}
 	 */
-	renderer: null,
-
-	cursor: null,
+	cursor: null, selectionManager: null, rangeHighlighter: null,
 
 	animQueue: [],
 	lastTime: Utils.now(),
@@ -49,7 +48,7 @@ var GridView = Backbone.View.extend({
 		// Setup the PIXI Stage.
 		var colors = [0x000000, 0x333333, 0x1abc9c, 0x3498db, 0xf39c12, 
 				0xecf0f1, 0x7f8c8d, 0x95a5a6, 0xffffff, 0x808080];
-		this.stage = new PIXI.Stage(colors[9]);
+		this.stage = new PIXI.Stage(colors[8]);
 		this.pixiContainer = new PIXI.DisplayObjectContainer();
 		this.stage.addChild(this.pixiContainer);
 
@@ -122,15 +121,16 @@ var GridView = Backbone.View.extend({
 			
 			if (canMove){
 				// Animate.
-				this.animQueue.push({
-					piece: piece,
-					destX: stagePosition.x,
-					destY: stagePosition.y,
-					dx: (stagePosition.x - piece.position.x) / 300,
-					dy: (stagePosition.y - piece.position.y) / 300,
-					right: stagePosition.x > piece.position.x,
-					down: stagePosition.y > piece.position.y,
-				});
+				var destX = stagePosition.x;
+				var destY = stagePosition.y;
+				var currX = piece.position.x;
+				var currY = piece.position.y;
+				var dist = (destX-currX)*(destX-currX) + (destY-currY)*(destY-currY);
+				var duration = dist / 256;
+				var self = this;
+				var tween = new TWEEN.Tween(piece.position)
+						.to({x: destX, y: destY}, duration)
+						.start();
 			}
 		}
 	},
@@ -142,7 +142,6 @@ var GridView = Backbone.View.extend({
 	update: function (delta){
 		this.cursor.update(delta);
 		this.updateStageBounds(delta);
-		this.processAnimationQueue(delta);
 	},
 
 	updateStageBounds: function (){
@@ -158,29 +157,6 @@ var GridView = Backbone.View.extend({
 			}
 			if (this.cursor.graphics.getBounds().y > this.stageBounds.down){
 				this.stage.worldTransform.ty -= 20;
-			}
-		}
-	},
-
-	processAnimationQueue: function (delta){
-		// Process animation queue.
-		for (var i = 0; i<this.animQueue.length;i++){
-			var anim = this.animQueue[i];
-			var piece = anim.piece;
-			piece.position.x += (anim.dx * delta);
-			piece.position.y += (anim.dy * delta);
-
-			var toDestX = anim.destX - piece.position.x;
-			var toDestY = anim.destY - piece.position.y;
-			var moveTargetDotProduct = anim.dx * toDestX + anim.dy * toDestY;
-
-			if (moveTargetDotProduct < 0){
-				// Remove from queue if done, and update index.
-				this.animQueue.splice(i, 1);
-				piece.position.x = anim.destX;
-				piece.position.y = anim.destY;
-
-				i--;
 			}
 		}
 	},

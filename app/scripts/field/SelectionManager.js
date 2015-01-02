@@ -139,7 +139,7 @@ _.extend(SelectionManager.prototype, {
 		this.targetBox.position.set(selectBox.position.x, selectBox.position.y);
 		this.gridView.attackPiece(this.selectedStartTile, currentTile);
 		this.selectMode = SelectionManager.MODE.NONE;
-		
+
 		// Signal this event to subscribers.
 		this.trigger('selection:target', currentTile);
 		Audio.playSrc('sounds/click3.wav', 0.3);
