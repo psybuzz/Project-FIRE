@@ -390,6 +390,7 @@ var FieldView = Backbone.View.extend({
 
 		// Bind repeated functions.
 		this.animateBound_ = this.animate.bind(this);
+		this.listenTo(this.actionMenuView, 'close', this.onActionMenuClose);
 	},
 
 	render: function (){
@@ -442,6 +443,15 @@ var FieldView = Backbone.View.extend({
 	update: function (delta){
 		this.gridView.update(delta);
 		this.selectionManager.update(delta);
+	},
+
+	onActionMenuClose: function (e){
+		// TODO: Tell the selection manager whether or not the action was an
+		// attack/def, wait, or cancel.
+
+		// Let the SelectionManager know to resume grid selection behavior when
+		// the player's selected action has been completed.
+		this.selectionManager.onActionSet();
 	}
 });
 
@@ -704,12 +714,21 @@ var ActionMenuView = Backbone.View.extend({
 	el: '#actionMenuContainer',
 
 	/**
-	 * The current action set.
+	 * The current action set index.
 	 * @type {Number}
 	 */
 	actionSet: null,
 
+	/**
+	 * Whether or not the action menu is open.
+	 * @type {Boolean}
+	 */
 	isOpen: false,
+
+	events: {
+		'click .action-option': 'onActionClick',
+		'mouseover .action-option': 'onActionHover'
+	},
 
 	initialize: function (options){
 		options = options || {};
@@ -718,7 +737,7 @@ var ActionMenuView = Backbone.View.extend({
 
 		// Listen to Keyboard events when the menu is open.
 		_.extend(this, Backbone.Events);
-		this.listenTo(this.selectionManager, 'selection:target', this.onTargetSelected);
+		this.listenTo(this.selectionManager, 'selection:target', this.onTargetTileSelected);
 	},
 
 	render: function (){
@@ -737,14 +756,16 @@ var ActionMenuView = Backbone.View.extend({
 		this.isOpen = true;
 	},
 
-	close: function (){
+	close: function (cb){
 		if (!this.isOpen) return;
 
 		// Stop listening for keypresses.
 		this.stopListening(Key, 'keyup');
 
 		this.isOpen = false;
-		this.$el.fadeOut();
+		this.$el
+				.delay(200)
+				.fadeOut(cb);
 	},
 
 	/**
@@ -766,27 +787,68 @@ var ActionMenuView = Backbone.View.extend({
 	 * 
 	 * @param  {Object} tile The current tile data.
 	 */
-	onTargetSelected: function (tile){
+	onTargetTileSelected: function (tile){
 		// TODO: Get the index from the passed-in event data.
 		this.loadActions(0);
+
+		// Highlight the first option by default.
+		var firstOptionEl = this.$el.find('.action-option')[0];
+		this.highlightOption(firstOptionEl);
+	},
+
+	onActionHover: function (e){
+		this.highlightOption(e.target);
+	},
+
+	onActionClick: function (e){
+		if (!e.target) return;
+
+		// Animate the selected option element.
+		var optionEl = $(e.target);
+		var currIndex = optionEl.data('action-index');
+		optionEl.addClass('active');
+
+		// Close the menu and then signal the event to subscribers.
+		this.close(function (){
+			this.trigger('close', {
+				actionSet: ActionSets[this.actionSet],
+				selectedIndex: currIndex
+			});
+		}.bind(this));
+	},
+
+	highlightOption: function (optionEl){
+		if (!optionEl) return;
+
+		var optionElements = this.$el.find('.action-option');
+		optionElements.removeClass('selected');
+		optionEl.classList.add('selected');
 	},
 
 	/**
 	 * The callback when a key is pressed to navigate the action menu.
 	 */
-	onKeyUp: function (){
-		if (Key.isPressed(['SPACE', 'ENTER'])){
+	onKeyUp: function (e){
+		var optionElements = this.$el.find('.action-option');
+		var currOptionEl = optionElements.filter('.selected');
+		var numOptions = optionElements.length;
+		var currIndex = currOptionEl.data('action-index');
+		var prevIndex = currIndex === 0 ? numOptions - 1 : currIndex - 1;
+		var nextIndex = currIndex === numOptions - 1 ? 0 : currIndex + 1;
 
-		} else if (Key.isPressed(['UP'])){
+		if (Key.matches(e.keyCode, ['SPACE', 'ENTER'])){
+			this.onActionClick({target: currOptionEl});
+		} else if (Key.matches(e.keyCode, ['UP'])){
+			this.highlightOption(optionElements[prevIndex]);
+		} else if (Key.matches(e.keyCode, ['DOWN'])){
+			this.highlightOption(optionElements[nextIndex]);
+		} else if (Key.matches(e.keyCode, ['LEFT'])){
 
-		} else if (Key.isPressed(['DOWN'])){
-
-		} else if (Key.isPressed(['LEFT'])){
-
-		} else if (Key.isPressed(['RIGHT'])){
+		} else if (Key.matches(e.keyCode, ['RIGHT'])){
 
 		}
-	}
+	},
+
 });
 
 
@@ -1364,14 +1426,16 @@ _.extend(SelectionManager.prototype, {
 		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
-	setAction: function (){
+	/**
+	 * This function is called when the player has chosen an action from the 
+	 * action menu and it has fully completed.  It should be called by the 
+	 * FieldView, which has knowledge of the ActionMenuView.
+	 */
+	onActionSet: function (){
 		this.selectMode = SelectionManager.MODE.NONE;
 
 		// Unfreeze the cursor.
 		this.cursor.isFrozen = false;
-
-		// Signal this event to subscribers.
-		this.trigger('selection:action', currentTile);
 		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 

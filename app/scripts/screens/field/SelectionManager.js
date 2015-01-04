@@ -160,14 +160,16 @@ _.extend(SelectionManager.prototype, {
 		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
-	setAction: function (){
+	/**
+	 * This function is called when the player has chosen an action from the 
+	 * action menu and it has fully completed.  It should be called by the 
+	 * FieldView, which has knowledge of the ActionMenuView.
+	 */
+	onActionSet: function (){
 		this.selectMode = SelectionManager.MODE.NONE;
 
 		// Unfreeze the cursor.
 		this.cursor.isFrozen = false;
-
-		// Signal this event to subscribers.
-		this.trigger('selection:action', currentTile);
 		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 

@@ -7,6 +7,15 @@ body {
     border-bottom: 80px solid whitesmoke;*/
 }
 
+.noselect{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .hidden{
     display: none;
 }
@@ -52,6 +61,7 @@ body {
     position: fixed;
     top: 80px;
     left: 0px;
+    width: 50%;
 }
 
 #actionMenuContainer .action-menu{
@@ -64,23 +74,34 @@ body {
     background-color: rgba(50,50,50,0.8);
     color: white;
     font-size: 22px;
-    padding: 5px 50px 5px 170px;
+    padding: 15px 80px 15px 270px;
     margin-bottom: 7px;
-    transform: rotate(17deg);
+    transform: rotate(7deg);
     cursor: pointer;
+    border-radius: 3px;
 
     transition: 0.2s ease background-color,
-            0.2s ease transform;
-}
-
-#actionMenuContainer .action-menu li:hover{
-    background-color: rgba(50,50,50,1);
-    color: white;
-    transform: rotate(8deg);
+            0.1s ease transform,
+            0.2s ease padding;
 }
 
 #actionMenuContainer .action-menu li.selected{
-    border: 3px dashed orange;
+    background-color: rgba(250,50,50,1);
+    padding-left: 350px;
+    padding-right: 200px;
+    transform: rotate(0deg);
+}
+
+#actionMenuContainer .action-menu li:active{
+    padding-left: 350px;
+    padding-right: 150%;
+    transform: rotate(0deg);
+}
+
+#actionMenuContainer .action-menu li.active{
+    padding-left: 350px;
+    padding-right: 150%;
+    transform: rotate(0deg);
 }
 
 .browsehappy {

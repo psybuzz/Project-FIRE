@@ -37,9 +37,9 @@
 
     <!-- Client-side HTML Templates -->
     <script type="text/template" id="actionMenuTemplate">
-        <ul class="action-menu">
+        <ul class="action-menu noselect">
             <% _.each(actionOptions, function(item, i){ %>
-                <li class="action-option" data-action="<% print(i) %>">
+                <li class="action-option" data-action-index="<% print(i) %>">
                     <% print(item) %>
                 </li>
             <% }); %>

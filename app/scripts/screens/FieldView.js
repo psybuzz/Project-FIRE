@@ -33,6 +33,7 @@ var FieldView = Backbone.View.extend({
 
 		// Bind repeated functions.
 		this.animateBound_ = this.animate.bind(this);
+		this.listenTo(this.actionMenuView, 'close', this.onActionMenuClose);
 	},
 
 	render: function (){
@@ -85,6 +86,15 @@ var FieldView = Backbone.View.extend({
 	update: function (delta){
 		this.gridView.update(delta);
 		this.selectionManager.update(delta);
+	},
+
+	onActionMenuClose: function (e){
+		// TODO: Tell the selection manager whether or not the action was an
+		// attack/def, wait, or cancel.
+
+		// Let the SelectionManager know to resume grid selection behavior when
+		// the player's selected action has been completed.
+		this.selectionManager.onActionSet();
 	}
 });
 
