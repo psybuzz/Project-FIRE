@@ -80,4 +80,4 @@ GridModel.tileDistance = function (srcTile, destTile){
 	var yDist = Math.abs(destTile.y - srcTile.y);
 
 	return xDist+yDist;
-}
+};

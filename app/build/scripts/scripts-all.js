@@ -46,7 +46,7 @@ ViewManager.prototype.loadView = function (viewName){
 	// Load the new view and update the state.
 	newView.enterView(oldView);
 	this.currentView = newView;
-}
+};
 
 
 // Define enumerable values.
@@ -54,7 +54,7 @@ ViewManager.VIEWS = {
 	INTRO: 'intro',
 	MENU: 'menu',
 	FIELD: 'field'
-}
+};
 
 /**
  * This file contains character-related classes and logic, defining ally and 
@@ -64,7 +64,7 @@ ViewManager.VIEWS = {
 /**
  * An interface for all non-player characters, including allies and enemies.
  */
-function NPC (){};
+function NPC (){}
 NPC.prototype.constructor = function (options){
 	options = options || {};
 
@@ -83,7 +83,7 @@ NPC.prototype.constructor = function (options){
 	this.moved = false;
 	this.moveRange = Math.floor(Math.random()*3)+3;
 	this.attackRange = Math.floor(Math.random()*2)+1;
-}
+};
 
 function Ally (options){
 	options.color = options.color || 0x21689B;
@@ -109,7 +109,7 @@ function Cursor (options){
 	// Draw a triangle using lines
 	var colors = [0x000000, 0x333333, 0x1abc9c, 0x3498db, 0xf39c12, 
 				0xecf0f1, 0x7f8c8d, 0x95a5a6, 0xffffff];
-	graphics.beginFill(options['color'] || colors[2]);		// Cursor color.
+	graphics.beginFill(options.color || colors[2]);		// Cursor color.
 	graphics.moveTo(10, 10);
 	graphics.lineTo(10, 50);
 	graphics.lineTo(50, 47);
@@ -201,7 +201,7 @@ function Grid (rowN, colN, cellWidth, cellHeight){
 			gy = j*cellHeight;
 
 			// Normal grid.
-			var cellPadding = 12;
+			cellPadding = 12;
 			grid.lineStyle(1, 0x7f8c8d, 1);
 			grid.moveTo(gx + cellPadding, gy);
 			grid.lineTo(gx + cellWidth - cellPadding, gy);
@@ -559,7 +559,7 @@ GridModel.tileDistance = function (srcTile, destTile){
 	var yDist = Math.abs(destTile.y - srcTile.y);
 
 	return xDist+yDist;
-}
+};
 
 /**
  * This file contains logic related to the visual representation of the grid on
@@ -802,9 +802,9 @@ _.extend(RangeHighlighter.prototype, {
 		console.log(tile, moveRange, attackRange);
 
 		// Build from left to center, then center to right.
-		var gx, gy;
-		for (var i=0; i<=moveRange; i++){
-			for (var j=0; j<=i; j++){
+		var gx, gy, i, j;
+		for (i=0; i<=moveRange; i++){
+			for (j=0; j<=i; j++){
 				// Lower half.
 				gx = (tile.x+i-moveRange)*cellWidth;
 				gy = (tile.y+j)*cellHeight;
@@ -833,8 +833,8 @@ _.extend(RangeHighlighter.prototype, {
 			}
 		}
 
-		for (var i=1; i<=moveRange; i++){
-			for (var j=0; j<=moveRange-i; j++){
+		for (i=1; i<=moveRange; i++){
+			for (j=0; j<=moveRange-i; j++){
 				// Lower half.
 				gx = (tile.x+i)*cellWidth;
 				gy = (tile.y+j)*cellHeight;
@@ -1090,14 +1090,14 @@ _.extend(SelectionManager.prototype, {
 		return {
 			x: this.cellWidth * Math.floor(position.x / this.cellWidth),
 			y: this.cellHeight * Math.floor(position.y / this.cellHeight)
-		}
+		};
 	},
 	
 	getTileFromPosition: function (position){
 		return {
 			x: Math.floor(position.x / this.cellWidth),
 			y: Math.floor(position.y / this.cellHeight)
-		}
+		};
 	},
 
 	// Gets the stage position from the tile indices
@@ -1110,7 +1110,7 @@ _.extend(SelectionManager.prototype, {
 		return {
 			x: this.cellWidth * tileX + (this.cellWidth/2),
 			y: this.cellHeight * tileY + (this.cellHeight/2)
-		}
+		};
 	}
 });
 
@@ -1218,7 +1218,7 @@ var FieldView = Backbone.View.extend({
 FieldView.TURN = {
 	PLAYER: 'player',
 	AI: 'ai'
-}
+};
 
 /**
  *
@@ -1272,7 +1272,7 @@ var Audio = {
 		if (volume) this.dynamicTag.volume = volume;
 		this.dynamicTag.oncanplay = function (){
 			this.play();
-		}
+		};
 	}
 };
 
@@ -1391,9 +1391,12 @@ document.body.onkeyup = function(e){
 	Key.onKeyUp(e);
 };
 
-Bigram = {"th": 1.52, "en": 0.55, "ng": 0.18, "he": 1.28, "ed": 0.53, "of": 0.16, "in": 0.94, "to": 0.52, "al": 0.09, "er": 0.94, "it": 0.50, "de": 0.09, "an": 0.82, "ou": 0.50, "se": 0.08, "re": 0.68, "ea": 0.47, "le": 0.08, "nd": 0.63, "hi": 0.46, "sa": 0.06, "at": 0.59, "is": 0.46, "si": 0.05, "on": 0.57, "or": 0.43, "ar": 0.04, "nt": 0.56, "ti": 0.34, "ve": 0.04, "ha": 0.56, "as": 0.33, "ra": 0.04, "es": 0.56, "te": 0.27, "ld": 0.02, "st": 0.55, "et": 0.19, "ur": 0.02};
-ab = alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-Names = {
+/**
+ * This file contains logic related to linguistic functions such as generating 
+ * names.
+ */
+
+var Names = {
        male: ["Jacob", "Mason", "Ethan", "Noah", "William", "Liam", "Jayden", "Michael", "Alexander", "Aiden"],
        female: ["Sophia", "Emma", "Isabella", "Olivia", "Ava", "Emily", "Abigail", "Mia", "Madison", "Elizabeth"],
        random: function(gender){
@@ -1404,217 +1407,8 @@ Names = {
                      return this.female[Math.floor(Math.random()*this.female.length)];
               }
        }
-}
+};
 
-function histogram(text){
-       //split text if it's a string
-       var tokens = (typeof text === 'string') ? split(text) : text;
-       var hist = {};
-
-       for (var i=0, len=tokens.length; i<len; i++){
-              var e = tokens[i];
-              hist[e] = (++hist[e]) || 1;
-       }
-       return hist;
-}
-
-//splits a string into words
-function split(text){
-       var sand = text.replace(/\.|,|!|;|:|\?/g, '').trim().split(/\s+/);
-       return sand;
-}
-
-//returns a list of distinct tokens
-function tokenize(list){
-       list = (typeof list === 'string') ? split(list) : list;
-       var found = {};
-       var newlist = new Array(), ct = 0;
-       for (var i=0; i<list.length; i++){
-              var e = list[i];
-              // found[e] = (found[e]++) || 0;
-              if (e.length > 0 && found[e] != 1){                //use more space, take less time
-                     newlist[ct++] = e;
-                     found[e] = 1;
-              }
-       }
-       // found = null;            //garbage collect
-
-       return newlist;
-}
-
-//counts occurrences of Key in List
-function occurs(key, list){
-       var ct = 0;
-       for (var e in list){
-              if (key === list[e]){
-                     ct++;
-              }
-       }
-       return ct;
-}
-
-//probability of A given B in a set of tokens
-function P(a, b, tokens){
-       var bCount = 0;
-       var baCount = 0;
-       var diff = (a == b);
-       for (var i=0, len=tokens.length; i<len-1; i++){
-              if (tokens[i] == b){
-                     bCount++;
-                     if (i+1<len && (tokens[i+1] == a)){
-                            baCount++;
-                            i += (diff) ? 1 : 0;
-                     }
-              }
-       }
-       if (bCount == 0){
-              return 0;
-       }
-       return baCount / bCount;
-}
-
-
-//similarity measure
-function similar(one, two){
-       if (one.length == 0 || two.length == 0){
-              return 0;
-       }
-
-       var shared = 0;
-       for (var o in one){
-              if (one.hasOwnProperty(o) && two.indexOf(one[o]) != -1){    //if we found a duplicate, 
-                     shared += 1;
-              }
-       }
-       return 2*shared / (one.length + two.length);
-}
-
-function around(target, spread){
-       return Math.random()*spread + target - (spread/2);
-}
-
-
-function word(len){
-       len = len || -1;
-       var done = false;
-       var word = "";
-       var lastlet = ab[Math.floor(ab.length*Math.random())];
-       var newlet;
-       word += lastlet;
-
-       while ( (!done) ){
-              if ( len == -1 && Math.random() > 0.5 ){    //no bound, keep rolling dice         
-                     $.each(Bigram, function(k, v){
-                            if (k[0] == lastlet && Math.random() < v){
-                                   newlet = k[1];
-                            }
-                     });
-
-                     //if still undefined, give it a random letter
-                     if (newlet === undefined){
-                            newlet = ab[Math.floor(ab.length*Math.random())];
-                     }
-              } else if (word.length < len) {             //keep going until bound is hit
-                     $.each(Bigram, function(k, v){
-                            if (k[0] == lastlet && Math.random() < v){
-                                   newlet = k[1];
-                            }
-                     });
-
-                     //if still undefined, give it a random letter
-                     if (newlet === undefined){
-                            newlet = ab[Math.floor(ab.length*Math.random())];
-                     }
-              } else {
-                     done = true;
-                     newlet = "";
-              }
-
-              word += newlet;
-              lastlet = newlet;
-              newlet = undefined;
-       }
-
-       return word;
-}
-
-function sentence(len, wordlen){
-       len = len || Math.random()*7+3;
-       var sentence = "";
-       for (var i=0; i<len; i++){
-              sentence += word(wordlen) + " ";
-       }
-       return sentence.trim();
-}
-
-var langs =
-[['Afrikaans',       ['af-ZA']],
- ['Bahasa Indonesia',['id-ID']],
- ['Bahasa Melayu',   ['ms-MY']],
- ['Català',          ['ca-ES']],
- ['Čeština',         ['cs-CZ']],
- ['Deutsch',         ['de-DE']],
- ['English',         ['en-AU', 'Australia'],
-                     ['en-CA', 'Canada'],
-                     ['en-IN', 'India'],
-                     ['en-NZ', 'New Zealand'],
-                     ['en-ZA', 'South Africa'],
-                     ['en-GB', 'United Kingdom'],
-                     ['en-US', 'United States']],
- ['Español',         ['es-AR', 'Argentina'],
-                     ['es-BO', 'Bolivia'],
-                     ['es-CL', 'Chile'],
-                     ['es-CO', 'Colombia'],
-                     ['es-CR', 'Costa Rica'],
-                     ['es-EC', 'Ecuador'],
-                     ['es-SV', 'El Salvador'],
-                     ['es-ES', 'España'],
-                     ['es-US', 'Estados Unidos'],
-                     ['es-GT', 'Guatemala'],
-                     ['es-HN', 'Honduras'],
-                     ['es-MX', 'México'],
-                     ['es-NI', 'Nicaragua'],
-                     ['es-PA', 'Panamá'],
-                     ['es-PY', 'Paraguay'],
-                     ['es-PE', 'Perú'],
-                     ['es-PR', 'Puerto Rico'],
-                     ['es-DO', 'República Dominicana'],
-                     ['es-UY', 'Uruguay'],
-                     ['es-VE', 'Venezuela']],
- ['Euskara',         ['eu-ES']],
- ['Français',        ['fr-FR']],
- ['Galego',          ['gl-ES']],
- ['Hrvatski',        ['hr_HR']],
- ['IsiZulu',         ['zu-ZA']],
- ['Íslenska',        ['is-IS']],
- ['Italiano',        ['it-IT', 'Italia'],
-                     ['it-CH', 'Svizzera']],
- ['Magyar',          ['hu-HU']],
- ['Nederlands',      ['nl-NL']],
- ['Norsk bokmål',    ['nb-NO']],
- ['Polski',          ['pl-PL']],
- ['Português',       ['pt-BR', 'Brasil'],
-                     ['pt-PT', 'Portugal']],
- ['Română',          ['ro-RO']],
- ['Slovenčina',      ['sk-SK']],
- ['Suomi',           ['fi-FI']],
- ['Svenska',         ['sv-SE']],
- ['Türkçe',          ['tr-TR']],
- ['български',       ['bg-BG']],
- ['Pусский',         ['ru-RU']],
- ['Српски',          ['sr-RS']],
- ['한국어',            ['ko-KR']],
- ['中文',             ['cmn-Hans-CN', '普通话 (中国大陆)'],
-                     ['cmn-Hans-HK', '普通话 (香港)'],
-                     ['cmn-Hant-TW', '中文 (台灣)'],
-                     ['yue-Hant-HK', '粵語 (香港)']],
- ['日本語',           ['ja-JP']],
- ['Lingua latīna',   ['la']]];
-
-lang = langs[6];
-dialect = lang[6];
-
-var recognizing = false;
 /**
  * This file defines several general-use, miscellaneous utility functions which
  * can be used in other script files.
@@ -1630,7 +1424,7 @@ var Utils = {
 			r: Math.floor(Math.random()*255),
 			g: Math.floor(Math.random()*255),
 			b: Math.floor(Math.random()*255)
-		}
+		};
 	},
 
 	randomColor: function (){
@@ -1664,7 +1458,7 @@ var Utils = {
 	randomName: function (){
 		return Names.random();
 	}
-}
+};
 
 /**
  * This file contains the main entry point for the application.  It is intended

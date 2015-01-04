@@ -34,6 +34,6 @@ var Audio = {
 		if (volume) this.dynamicTag.volume = volume;
 		this.dynamicTag.oncanplay = function (){
 			this.play();
-		}
+		};
 	}
 };

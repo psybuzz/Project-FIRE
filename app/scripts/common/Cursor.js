@@ -8,7 +8,7 @@ function Cursor (options){
 	// Draw a triangle using lines
 	var colors = [0x000000, 0x333333, 0x1abc9c, 0x3498db, 0xf39c12, 
 				0xecf0f1, 0x7f8c8d, 0x95a5a6, 0xffffff];
-	graphics.beginFill(options['color'] || colors[2]);		// Cursor color.
+	graphics.beginFill(options.color || colors[2]);		// Cursor color.
 	graphics.moveTo(10, 10);
 	graphics.lineTo(10, 50);
 	graphics.lineTo(50, 47);

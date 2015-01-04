@@ -6,7 +6,7 @@
 /**
  * An interface for all non-player characters, including allies and enemies.
  */
-function NPC (){};
+function NPC (){}
 NPC.prototype.constructor = function (options){
 	options = options || {};
 
@@ -25,7 +25,7 @@ NPC.prototype.constructor = function (options){
 	this.moved = false;
 	this.moveRange = Math.floor(Math.random()*3)+3;
 	this.attackRange = Math.floor(Math.random()*2)+1;
-}
+};
 
 function Ally (options){
 	options.color = options.color || 0x21689B;

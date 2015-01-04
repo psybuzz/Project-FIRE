@@ -223,14 +223,14 @@ _.extend(SelectionManager.prototype, {
 		return {
 			x: this.cellWidth * Math.floor(position.x / this.cellWidth),
 			y: this.cellHeight * Math.floor(position.y / this.cellHeight)
-		}
+		};
 	},
 	
 	getTileFromPosition: function (position){
 		return {
 			x: Math.floor(position.x / this.cellWidth),
 			y: Math.floor(position.y / this.cellHeight)
-		}
+		};
 	},
 
 	// Gets the stage position from the tile indices
@@ -243,7 +243,7 @@ _.extend(SelectionManager.prototype, {
 		return {
 			x: this.cellWidth * tileX + (this.cellWidth/2),
 			y: this.cellHeight * tileY + (this.cellHeight/2)
-		}
+		};
 	}
 });
 

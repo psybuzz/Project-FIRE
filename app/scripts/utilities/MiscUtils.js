@@ -13,7 +13,7 @@ var Utils = {
 			r: Math.floor(Math.random()*255),
 			g: Math.floor(Math.random()*255),
 			b: Math.floor(Math.random()*255)
-		}
+		};
 	},
 
 	randomColor: function (){
@@ -47,4 +47,4 @@ var Utils = {
 	randomName: function (){
 		return Names.random();
 	}
-}
+};

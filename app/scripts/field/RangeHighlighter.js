@@ -72,9 +72,9 @@ _.extend(RangeHighlighter.prototype, {
 		console.log(tile, moveRange, attackRange);
 
 		// Build from left to center, then center to right.
-		var gx, gy;
-		for (var i=0; i<=moveRange; i++){
-			for (var j=0; j<=i; j++){
+		var gx, gy, i, j;
+		for (i=0; i<=moveRange; i++){
+			for (j=0; j<=i; j++){
 				// Lower half.
 				gx = (tile.x+i-moveRange)*cellWidth;
 				gy = (tile.y+j)*cellHeight;
@@ -103,8 +103,8 @@ _.extend(RangeHighlighter.prototype, {
 			}
 		}
 
-		for (var i=1; i<=moveRange; i++){
-			for (var j=0; j<=moveRange-i; j++){
+		for (i=1; i<=moveRange; i++){
+			for (j=0; j<=moveRange-i; j++){
 				// Lower half.
 				gx = (tile.x+i)*cellWidth;
 				gy = (tile.y+j)*cellHeight;

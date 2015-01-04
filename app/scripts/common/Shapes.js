@@ -25,7 +25,7 @@ function Grid (rowN, colN, cellWidth, cellHeight){
 			gy = j*cellHeight;
 
 			// Normal grid.
-			var cellPadding = 12;
+			cellPadding = 12;
 			grid.lineStyle(1, 0x7f8c8d, 1);
 			grid.moveTo(gx + cellPadding, gy);
 			grid.lineTo(gx + cellWidth - cellPadding, gy);

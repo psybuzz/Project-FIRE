@@ -93,4 +93,4 @@ var FieldView = Backbone.View.extend({
 FieldView.TURN = {
 	PLAYER: 'player',
 	AI: 'ai'
-}
+};

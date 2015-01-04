@@ -46,7 +46,7 @@ ViewManager.prototype.loadView = function (viewName){
 	// Load the new view and update the state.
 	newView.enterView(oldView);
 	this.currentView = newView;
-}
+};
 
 
 // Define enumerable values.
@@ -54,4 +54,4 @@ ViewManager.VIEWS = {
 	INTRO: 'intro',
 	MENU: 'menu',
 	FIELD: 'field'
-}
+};
