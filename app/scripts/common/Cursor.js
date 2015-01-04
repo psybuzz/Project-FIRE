@@ -23,6 +23,8 @@ function Cursor (options){
 	this.maxDx = 10;
 	this.maxDy = 10;
 
+	this.isFrozen = false;
+
 	// Add an interactive area.
 	graphics.hitArea = new PIXI.Circle(100,100,50);
 	graphics.setInteractive(true);
@@ -37,8 +39,10 @@ function Cursor (options){
 }
 
 Cursor.prototype.update = function(){
-	this.graphics.position.x += this.dx;
-	this.graphics.position.y += this.dy;
+	if (!this.isFrozen){
+		this.graphics.position.x += this.dx;
+		this.graphics.position.y += this.dy;
+	}
 };
 
 Cursor.prototype.onKeyDown = function(e){

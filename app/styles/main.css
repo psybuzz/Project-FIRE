@@ -47,6 +47,42 @@ body {
     transition: 0.2s ease transform;
 }
 
+#actionMenuContainer{
+    display: none;
+    position: fixed;
+    top: 80px;
+    left: 0px;
+}
+
+#actionMenuContainer .action-menu{
+    list-style-type: none;
+    padding: 0;
+    margin: 0px 0px 0px -50px;
+}
+
+#actionMenuContainer .action-menu li{
+    background-color: rgba(50,50,50,0.8);
+    color: white;
+    font-size: 22px;
+    padding: 5px 50px 5px 170px;
+    margin-bottom: 7px;
+    transform: rotate(17deg);
+    cursor: pointer;
+
+    transition: 0.2s ease background-color,
+            0.2s ease transform;
+}
+
+#actionMenuContainer .action-menu li:hover{
+    background-color: rgba(50,50,50,1);
+    color: white;
+    transform: rotate(8deg);
+}
+
+#actionMenuContainer .action-menu li.selected{
+    border: 3px dashed orange;
+}
+
 .browsehappy {
     margin: 0.2em 0;
     background: #ccc;

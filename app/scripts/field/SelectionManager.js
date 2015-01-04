@@ -15,6 +15,9 @@ function SelectionManager (options){
 
 	// Keep tile state.
 	this.currentTile = this.gridModel.getTile(0, 0);
+	this.selectedStartTile = null;
+	this.selectedEndTile = null;
+	this.selectedTargetTile = null;
 
 	// Set the selection mode to NONE by default.
 	this.selectMode = SelectionManager.MODE.NONE;
@@ -114,6 +117,7 @@ _.extend(SelectionManager.prototype, {
 		var startCharacter = startTile && this.gridModel.getTile(startTile);
 		var moveRange = startCharacter && startCharacter.moveRange;
 		var tileDist = GridModel.tileDistance(startTile, currentTile);
+		this.selectedEndTile = currentTile;
 
 		// Trigger an End event only when we choose an end within the selected
 		// character's movement range.
@@ -135,13 +139,35 @@ _.extend(SelectionManager.prototype, {
 	setTarget: function (){
 		var selectBox = this.selectBox;
 		var currentTile = this.getCurrentTile();
-		
+		this.selectedTargetTile = currentTile;
+
+		// TODO: If the target is the same as the destination, the player likely
+		// just wants to stop the unit there.  We should check that the tiles' 
+		// coordinates are the same, and move without attacking.
+		if (this.selectedEndTile === this.selectedTargetTile){
+
+		}
+
 		this.targetBox.position.set(selectBox.position.x, selectBox.position.y);
 		this.gridView.attackPiece(this.selectedStartTile, currentTile);
-		this.selectMode = SelectionManager.MODE.NONE;
+		this.selectMode = SelectionManager.MODE.ACTION;
+
+		// Freeze the cursor, since the action menu will open.
+		this.cursor.isFrozen = true;		
 
 		// Signal this event to subscribers.
 		this.trigger('selection:target', currentTile);
+		Audio.playSrc('sounds/click3.wav', 0.3);
+	},
+
+	setAction: function (){
+		this.selectMode = SelectionManager.MODE.NONE;
+
+		// Unfreeze the cursor.
+		this.cursor.isFrozen = false;
+
+		// Signal this event to subscribers.
+		this.trigger('selection:action', currentTile);
 		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
@@ -226,5 +252,6 @@ _.extend(SelectionManager.prototype, {
 SelectionManager.MODE = {
 	NONE: 0,
 	STARTED: 1,
-	TARGET: 2
+	TARGET: 2,
+	ACTION: 3
 };

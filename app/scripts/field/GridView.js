@@ -28,9 +28,11 @@ var GridView = Backbone.View.extend({
 	 */
 	cursor: null, selectionManager: null, rangeHighlighter: null,
 
-	animQueue: [],
-	lastTime: Utils.now(),
-
+	/**
+	 * The stage bounds.  When the cursor moves out of this region, the world 
+	 * will automatically scroll to keep the cursor in view.
+	 * @type {Object}
+	 */
 	stageBounds: {
 		left: 50,
 		right: window.innerWidth - 50,

@@ -23,6 +23,9 @@ var FieldView = Backbone.View.extend({
 		this.stage = this.gridView.stage;
 		this.renderer = this.gridView.renderer;
 		this.selectionManager = this.gridView.selectionManager;
+		this.actionMenuView = new ActionMenuView({
+			selectionManager: this.selectionManager
+		});
 
 		// Set the first turn to the player by default.
 		this.turn = options.firstTurn || FieldView.TURN.PLAYER;
@@ -47,7 +50,14 @@ var FieldView = Backbone.View.extend({
 		this.render();
 	},
 
-	leaveView: function (newView){},
+	leaveView: function (newView){
+		var x = new TWEEN.Tween(b)
+				.to({blurX: 50}, 800)
+				.start();
+		x = new TWEEN.Tween(g.pixiContainer)
+				.to({rotation: 0.3, alpha:0}, 800)
+				.start();
+	},
 
 	completeTurn: function (){
 		if (this.turn === FieldView.TURN.PLAYER){

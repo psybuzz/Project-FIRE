@@ -2,6 +2,8 @@
  * This file contains logic related to highlighting ranges on the grid in the 
  * Field screen.  These ranges help the player understand how far a unit can
  * move or attack.
+ *
+ * RangeHighlighter depends on a SelectionManager to provide it events.
  */
 
 function RangeHighlighter (options){
