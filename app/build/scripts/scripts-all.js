@@ -356,6 +356,343 @@ function Circle (x, y, color, radius){
 }
 
 /**
+ * This file contains logic related to the field view where the grid is located.
+ * It also acts as a controller for the playing logic on the field, holding 
+ * information related to whose turn it is, etc.
+ *
+ * FieldView depends on the GridView to render a grid and objects within it.
+ * In this relationship, GridView creates and handles the PIXI stage while
+ * FieldView controls higher level behaviors.
+ */
+
+var FieldView = Backbone.View.extend({
+	turn: null,
+	allies: [],
+	enemies: [],
+
+	initialize: function (options){
+		options = options || {};
+		this.chatView = new ChatView();
+		this.battleView = new BattleView();
+		this.gridView = new GridView();
+		this.gridView.render();
+
+		this.stage = this.gridView.stage;
+		this.renderer = this.gridView.renderer;
+		this.selectionManager = this.gridView.selectionManager;
+		this.actionMenuView = new ActionMenuView({
+			selectionManager: this.selectionManager
+		});
+
+		// Set the first turn to the player by default.
+		this.turn = options.firstTurn || FieldView.TURN.PLAYER;
+		this.addedPIXIView = false;
+
+		// Bind repeated functions.
+		this.animateBound_ = this.animate.bind(this);
+	},
+
+	render: function (){
+		// Add the PIXI renderer to the page.
+		if (!this.addedPIXIView){
+			this.el.appendChild(this.renderer.view);
+			this.addedPIXIView = true;
+		}
+
+		// Start animating.
+		this.animateBound_();
+	},
+
+	enterView: function (lastView){
+		this.render();
+	},
+
+	leaveView: function (newView){
+		var x = new TWEEN.Tween(b)
+				.to({blurX: 50}, 800)
+				.start();
+		x = new TWEEN.Tween(g.pixiContainer)
+				.to({rotation: 0.3, alpha:0}, 800)
+				.start();
+	},
+
+	completeTurn: function (){
+		if (this.turn === FieldView.TURN.PLAYER){
+			this.turn = FieldView.TURN.AI;
+		} else if (this.turn === FieldView.TURN.AI){
+			this.turn = FieldView.TURN.PLAYER;
+		}
+	},
+
+	animate: function (){
+		// Calculate timing.
+		var time = Utils.now();
+		var delta = time - this.lastTime;
+		this.lastTime = time;
+
+		// Update state.
+		this.update(delta);
+		TWEEN.update(time);
+
+		// Render the stage and repeat the animation loop.
+		this.renderer.render(this.stage);
+		requestAnimationFrame(this.animateBound_);
+	},
+
+	update: function (delta){
+		this.gridView.update(delta);
+		this.selectionManager.update(delta);
+	}
+});
+
+
+// Define enumerable values.
+FieldView.TURN = {
+	PLAYER: 'player',
+	AI: 'ai'
+};
+
+/**
+ *
+ */
+
+var IntroView = Backbone.View.extend({
+	
+});
+
+/**
+ *
+ */
+
+var MenuView = Backbone.View.extend({
+	
+});
+
+/**
+ * This file contains audio related logic to control sounds.
+ */
+
+/**
+ * Audio module.
+ */
+var Audio = {
+	audioTags: [
+		document.getElementById('sound1'),
+		document.getElementById('sound2')
+	],
+
+	dynamicTag: document.getElementById('dynamicSound'),
+
+	/**
+	 * Play a sound using a predefined audio tag.
+	 * 
+	 * @param  {Number} index  	The audio tag index.
+	 * @param  {Number} volume 	The volume from 0 to 1.
+	 */
+	play: function (track, volume){
+		if (typeof track === 'undefined'){
+			console.error('Bad track: Tried to play a missing sound');
+		}
+
+		var tag = this.audioTags[track];
+		if (volume) tag.volume = volume;
+		tag.play();
+	},
+
+	playSrc: function (src, volume){
+		this.dynamicTag.src = src;
+		if (volume) this.dynamicTag.volume = volume;
+		this.dynamicTag.oncanplay = function (){
+			this.play();
+		};
+	}
+};
+
+/**
+ * This file contains logic for input control.  For example, a Keyboard module
+ * controls behavior related to keypresses.
+ *
+ * Sources
+ * Keyboard Input helper
+ * - http://nokarma.org/2011/02/27/javascript-game-development-keyboard-input/
+ */
+
+/**
+ * Keyboard module.
+ */
+var Key = {
+	pressed: {},
+
+	keycodeMap: {
+		LEFT: 37,
+		UP: 38,
+		RIGHT: 39,
+		DOWN: 40,
+		W: 87,
+		A: 65,
+		S: 83,
+		D: 68,
+		BACKSPACE: 8,
+		ENTER: 13,
+		SPACE: 32,
+		ESC: 27,
+		COMMA: 188,
+		PERIOD: 190,
+		SLASH: 191,
+		L_SQ_BRACKET: 219,
+		R_SQ_BRACKET: 221,
+		NUM1: 49,
+		NUM2: 50,
+		NUM3: 51,
+		NUM4: 52,
+		NUM5: 53
+	},
+
+	isDown: function(keyCode){
+		return this.pressed[keyCode];
+	},
+
+	anyDown: function(){
+		var p = this.pressed;
+		var map = this.keycodeMap;
+		var keys = Object.keys(map);
+		for (var i=0; i<keys.length; i++){
+			if (p[map[keys[i]]] === true){
+				return true;
+			}
+		}
+
+		return false;
+	},
+
+	onKeyDown: function(e){
+		this.pressed[e.keyCode] = true;
+		Key.trigger('keydown', e);
+	},
+
+	onKeyUp: function(e){
+		this.pressed[e.keyCode] = undefined;
+		Key.trigger('keyup', e);
+	},
+
+	matches: function (keyCode, keys){
+		for (var i=0; i<keys.length; i++){
+			var key = keys[i];
+
+			// Check if the key matches.
+			if (keyCode === this.keycodeMap[key]){
+				return true;
+			}
+		}
+
+		// Return false if there is no match.
+		return false;
+	},
+
+	isPressed: function (keys){
+		for (var i=0; i<keys.length; i++){
+			var key = keys[i];
+
+			// Check if the key is valid.
+			if (!this.keycodeMap[key]){
+				console.error('Key not found');
+				return;
+			}
+
+			// Return true if the key is pressed.
+			if (this.pressed[this.keycodeMap[key]] === true){
+				return true;
+			}
+		}
+
+		// Return false by default if none of the keys were pressed.
+		return false;
+	}
+};
+
+
+// Use Backbone's Event system for pub/sub.
+_.extend(Key, Backbone.Events);
+
+// Bind keypress events.
+document.body.onkeydown = function (e){
+	Key.onKeyDown(e);
+};
+
+document.body.onkeyup = function(e){
+	Key.onKeyUp(e);
+};
+
+/**
+ * This file contains logic related to linguistic functions such as generating 
+ * names.
+ */
+
+var Names = {
+       male: ["Jacob", "Mason", "Ethan", "Noah", "William", "Liam", "Jayden", "Michael", "Alexander", "Aiden"],
+       female: ["Sophia", "Emma", "Isabella", "Olivia", "Ava", "Emily", "Abigail", "Mia", "Madison", "Elizabeth"],
+       random: function(gender){
+              gender = gender || (Math.random() > 0.5) ? 'male' : 'female';
+              if (gender == 'male'){
+                     return this.male[Math.floor(Math.random()*this.male.length)];
+              } else {
+                     return this.female[Math.floor(Math.random()*this.female.length)];
+              }
+       }
+};
+
+/**
+ * This file defines several general-use, miscellaneous utility functions which
+ * can be used in other script files.
+ */
+
+var Utils = {
+	now: function (){
+		return (performance && performance.now) ? performance.now() : Date.now();
+	},
+
+	randomRGB: function (){
+		return {
+			r: Math.floor(Math.random()*255),
+			g: Math.floor(Math.random()*255),
+			b: Math.floor(Math.random()*255)
+		};
+	},
+
+	randomColor: function (){
+		var r = Math.floor(Math.random()*255);
+		var g = Math.floor(Math.random()*255);
+		var b = Math.floor(Math.random()*255);
+
+		return 'rgb('+r+','+g+','+b+')';
+	},
+
+	randomHex: function (){
+		var color = this.randomRGB();
+
+		return this.rgbToHex(color.r, color.g, color.b);
+	},
+
+	/**
+	 * Converts RGB integers into Hex format.
+	 */
+	rgbToHex: function (r, g, b){
+		var red = r.toString(16);
+		var green = g.toString(16);
+		var blue = b.toString(16);
+		red = red == "0" ? "00" : red;
+		green = green == "0" ? "00" : green;
+		blue = blue == "0" ? "00" : blue;
+
+		return parseInt(red+green+blue, 16);
+	},
+
+	randomName: function (){
+		return Names.random();
+	}
+};
+
+/**
  * This file contains logic regarding the behavior of the action menu that 
  * allows players to select an action on the field.  Options include actions 
  * such as attacking, healing, and more.
@@ -545,7 +882,7 @@ var GridModel = Backbone.Model.extend({
 });
 
 // Define static class methods.
-// 
+
 /**
  * Computes the Manhattan distance between two tiles.
  * 
@@ -1121,343 +1458,6 @@ SelectionManager.MODE = {
 	STARTED: 1,
 	TARGET: 2,
 	ACTION: 3
-};
-
-/**
- * This file contains logic related to the field view where the grid is located.
- * It also acts as a controller for the playing logic on the field, holding 
- * information related to whose turn it is, etc.
- *
- * FieldView depends on the GridView to render a grid and objects within it.
- * In this relationship, GridView creates and handles the PIXI stage while
- * FieldView controls higher level behaviors.
- */
-
-var FieldView = Backbone.View.extend({
-	turn: null,
-	allies: [],
-	enemies: [],
-
-	initialize: function (options){
-		options = options || {};
-		this.chatView = new ChatView();
-		this.battleView = new BattleView();
-		this.gridView = new GridView();
-		this.gridView.render();
-
-		this.stage = this.gridView.stage;
-		this.renderer = this.gridView.renderer;
-		this.selectionManager = this.gridView.selectionManager;
-		this.actionMenuView = new ActionMenuView({
-			selectionManager: this.selectionManager
-		});
-
-		// Set the first turn to the player by default.
-		this.turn = options.firstTurn || FieldView.TURN.PLAYER;
-		this.addedPIXIView = false;
-
-		// Bind repeated functions.
-		this.animateBound_ = this.animate.bind(this);
-	},
-
-	render: function (){
-		// Add the PIXI renderer to the page.
-		if (!this.addedPIXIView){
-			this.el.appendChild(this.renderer.view);
-			this.addedPIXIView = true;
-		}
-
-		// Start animating.
-		this.animateBound_();
-	},
-
-	enterView: function (lastView){
-		this.render();
-	},
-
-	leaveView: function (newView){
-		var x = new TWEEN.Tween(b)
-				.to({blurX: 50}, 800)
-				.start();
-		x = new TWEEN.Tween(g.pixiContainer)
-				.to({rotation: 0.3, alpha:0}, 800)
-				.start();
-	},
-
-	completeTurn: function (){
-		if (this.turn === FieldView.TURN.PLAYER){
-			this.turn = FieldView.TURN.AI;
-		} else if (this.turn === FieldView.TURN.AI){
-			this.turn = FieldView.TURN.PLAYER;
-		}
-	},
-
-	animate: function (){
-		// Calculate timing.
-		var time = Utils.now();
-		var delta = time - this.lastTime;
-		this.lastTime = time;
-
-		// Update state.
-		this.update(delta);
-		TWEEN.update(time);
-
-		// Render the stage and repeat the animation loop.
-		this.renderer.render(this.stage);
-		requestAnimationFrame(this.animateBound_);
-	},
-
-	update: function (delta){
-		this.gridView.update(delta);
-		this.selectionManager.update(delta);
-	}
-});
-
-
-// Define enumerable values.
-FieldView.TURN = {
-	PLAYER: 'player',
-	AI: 'ai'
-};
-
-/**
- *
- */
-
-var IntroView = Backbone.View.extend({
-	
-});
-
-/**
- *
- */
-
-var MenuView = Backbone.View.extend({
-	
-});
-
-/**
- * This file contains audio related logic to control sounds.
- */
-
-/**
- * Audio module.
- */
-var Audio = {
-	audioTags: [
-		document.getElementById('sound1'),
-		document.getElementById('sound2')
-	],
-
-	dynamicTag: document.getElementById('dynamicSound'),
-
-	/**
-	 * Play a sound using a predefined audio tag.
-	 * 
-	 * @param  {Number} index  	The audio tag index.
-	 * @param  {Number} volume 	The volume from 0 to 1.
-	 */
-	play: function (track, volume){
-		if (typeof track === 'undefined'){
-			console.error('Bad track: Tried to play a missing sound');
-		}
-
-		var tag = this.audioTags[track];
-		if (volume) tag.volume = volume;
-		tag.play();
-	},
-
-	playSrc: function (src, volume){
-		this.dynamicTag.src = src;
-		if (volume) this.dynamicTag.volume = volume;
-		this.dynamicTag.oncanplay = function (){
-			this.play();
-		};
-	}
-};
-
-/**
- * This file contains logic for input control.  For example, a Keyboard module
- * controls behavior related to keypresses.
- *
- * Sources
- * Keyboard Input helper
- * - http://nokarma.org/2011/02/27/javascript-game-development-keyboard-input/
- */
-
-/**
- * Keyboard module.
- */
-var Key = {
-	pressed: {},
-
-	keycodeMap: {
-		LEFT: 37,
-		UP: 38,
-		RIGHT: 39,
-		DOWN: 40,
-		W: 87,
-		A: 65,
-		S: 83,
-		D: 68,
-		BACKSPACE: 8,
-		ENTER: 13,
-		SPACE: 32,
-		ESC: 27,
-		COMMA: 188,
-		PERIOD: 190,
-		SLASH: 191,
-		L_SQ_BRACKET: 219,
-		R_SQ_BRACKET: 221,
-		NUM1: 49,
-		NUM2: 50,
-		NUM3: 51,
-		NUM4: 52,
-		NUM5: 53
-	},
-
-	isDown: function(keyCode){
-		return this.pressed[keyCode];
-	},
-
-	anyDown: function(){
-		var p = this.pressed;
-		var map = this.keycodeMap;
-		var keys = Object.keys(map);
-		for (var i=0; i<keys.length; i++){
-			if (p[map[keys[i]]] === true){
-				return true;
-			}
-		}
-
-		return false;
-	},
-
-	onKeyDown: function(e){
-		this.pressed[e.keyCode] = true;
-		Key.trigger('keydown', e);
-	},
-
-	onKeyUp: function(e){
-		this.pressed[e.keyCode] = undefined;
-		Key.trigger('keyup', e);
-	},
-
-	matches: function (keyCode, keys){
-		for (var i=0; i<keys.length; i++){
-			var key = keys[i];
-
-			// Check if the key matches.
-			if (keyCode === this.keycodeMap[key]){
-				return true;
-			}
-		}
-
-		// Return false if there is no match.
-		return false;
-	},
-
-	isPressed: function (keys){
-		for (var i=0; i<keys.length; i++){
-			var key = keys[i];
-
-			// Check if the key is valid.
-			if (!this.keycodeMap[key]){
-				console.error('Key not found');
-				return;
-			}
-
-			// Return true if the key is pressed.
-			if (this.pressed[this.keycodeMap[key]] === true){
-				return true;
-			}
-		}
-
-		// Return false by default if none of the keys were pressed.
-		return false;
-	}
-};
-
-
-// Use Backbone's Event system for pub/sub.
-_.extend(Key, Backbone.Events);
-
-// Bind keypress events.
-document.body.onkeydown = function (e){
-	Key.onKeyDown(e);
-};
-
-document.body.onkeyup = function(e){
-	Key.onKeyUp(e);
-};
-
-/**
- * This file contains logic related to linguistic functions such as generating 
- * names.
- */
-
-var Names = {
-       male: ["Jacob", "Mason", "Ethan", "Noah", "William", "Liam", "Jayden", "Michael", "Alexander", "Aiden"],
-       female: ["Sophia", "Emma", "Isabella", "Olivia", "Ava", "Emily", "Abigail", "Mia", "Madison", "Elizabeth"],
-       random: function(gender){
-              gender = gender || (Math.random() > 0.5) ? 'male' : 'female';
-              if (gender == 'male'){
-                     return this.male[Math.floor(Math.random()*this.male.length)];
-              } else {
-                     return this.female[Math.floor(Math.random()*this.female.length)];
-              }
-       }
-};
-
-/**
- * This file defines several general-use, miscellaneous utility functions which
- * can be used in other script files.
- */
-
-var Utils = {
-	now: function (){
-		return (performance && performance.now) ? performance.now() : Date.now();
-	},
-
-	randomRGB: function (){
-		return {
-			r: Math.floor(Math.random()*255),
-			g: Math.floor(Math.random()*255),
-			b: Math.floor(Math.random()*255)
-		};
-	},
-
-	randomColor: function (){
-		var r = Math.floor(Math.random()*255);
-		var g = Math.floor(Math.random()*255);
-		var b = Math.floor(Math.random()*255);
-
-		return 'rgb('+r+','+g+','+b+')';
-	},
-
-	randomHex: function (){
-		var color = this.randomRGB();
-
-		return this.rgbToHex(color.r, color.g, color.b);
-	},
-
-	/**
-	 * Converts RGB integers into Hex format.
-	 */
-	rgbToHex: function (r, g, b){
-		var red = r.toString(16);
-		var green = g.toString(16);
-		var blue = b.toString(16);
-		red = red == "0" ? "00" : red;
-		green = green == "0" ? "00" : green;
-		blue = blue == "0" ? "00" : blue;
-
-		return parseInt(red+green+blue, 16);
-	},
-
-	randomName: function (){
-		return Names.random();
-	}
 };
 
 /**

@@ -3,6 +3,7 @@ var jshint = require('gulp-jshint');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+var sass = require('gulp-sass');
 
 // Define paths.
 var path = {
@@ -44,6 +45,13 @@ gulp.task('vendorScripts', function (){
 			.pipe(concat('vendor-all.min.js'))
 			.pipe(gulp.dest('app/build/scripts'));
 });
+
+// // TODO: Use gulp-sass.
+// gulp.task('sass', function (){
+// 	return gulp.src(path.scss)
+// 			.pipe(sass())
+// 			.pipe(gulp.dest('app/build/css'));
+// });
 
 // Watch source files for changes.
 gulp.task('watch', function (){

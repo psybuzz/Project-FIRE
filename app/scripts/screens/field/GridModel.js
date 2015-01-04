@@ -66,7 +66,7 @@ var GridModel = Backbone.Model.extend({
 });
 
 // Define static class methods.
-// 
+
 /**
  * Computes the Manhattan distance between two tiles.
  * 
