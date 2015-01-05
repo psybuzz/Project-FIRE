@@ -22,6 +22,7 @@ var Key = {
 		A: 65,
 		S: 83,
 		D: 68,
+		T: 84,
 		BACKSPACE: 8,
 		ENTER: 13,
 		SPACE: 32,

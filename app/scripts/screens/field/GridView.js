@@ -40,6 +40,12 @@ var GridView = Backbone.View.extend({
 		down: window.innerHeight-4 - 50,
 	},
 
+	/**
+	 * Whether or not the grid is zoomed out.
+	 * @type {Boolean}
+	 */
+	zoomOut: false,
+
 	initialize: function (options){
 		options = options || {};
 		this.rowN = options.rowN || 50;
@@ -51,7 +57,7 @@ var GridView = Backbone.View.extend({
 		var colors = [0x000000, 0x333333, 0x1abc9c, 0x3498db, 0xf39c12, 
 				0xecf0f1, 0x7f8c8d, 0x95a5a6, 0xffffff, 0x808080];
 		this.stage = new PIXI.Stage(colors[8]);
-		this.pixiContainer = new PIXI.DisplayObjectContainer();
+		this.pixiContainer = this.buildPixiContainer();
 		this.stage.addChild(this.pixiContainer);
 
 		// Setup the PIXI Renderer.
@@ -61,6 +67,9 @@ var GridView = Backbone.View.extend({
 
 		// Create a grid model.
 		this.gridModel = new GridModel({rowN: this.rowN, colN: this.colN});
+
+		// Listen for keypress events.
+		this.listenTo(Key, 'keyup', this.onKeyUp);
 	},
 
 	render: function (){
@@ -72,6 +81,41 @@ var GridView = Backbone.View.extend({
 		this.selectionManager = new SelectionManager({gridView: this});
 		this.rangeHighlighter = new RangeHighlighter({gridView: this});
 		this.addCharacters();
+	},
+
+	buildPixiContainer: function (){
+		var container = new PIXI.DisplayObjectContainer();
+
+		// Setup PIXI filters.
+		var blurFilter = new PIXI.BlurFilter();
+		blurFilter.blurX = 0;
+		blurFilter.blurY = 0;
+		container.filters = [blurFilter];
+		
+		// Store filters.
+		this.filters = {
+			'blur': blurFilter
+		};
+
+		return container;
+	},
+
+	enterBattleTransition: function (){
+		var blurTransition = new TWEEN.Tween(this.filters.blur)
+				.to({blurX: 64}, 800)
+				.start();
+		var rotateTransition = new TWEEN.Tween(this.pixiContainer)
+				.to({rotation: 0.3, alpha: 0}, 800)
+				.start();
+	},
+
+	exitBattleTransition: function (){
+		var blurTransition = new TWEEN.Tween(this.filters.blur)
+				.to({blurX: 0}, 800)
+				.start();
+		var rotateTransition = new TWEEN.Tween(this.pixiContainer)
+				.to({rotation: 0, alpha: 1}, 800)
+				.start();
 	},
 
 	addCharacters: function (){
@@ -162,5 +206,30 @@ var GridView = Backbone.View.extend({
 
 	onResize: function (){
 		this.renderer.resize(window.innerWidth, window.innerHeight);
+	},
+
+	onKeyUp: function (e){
+		if (Key.matches(e.keyCode, ['T'])){
+			if (this.zoomOut){
+				this.hideOverview();
+			} else {
+				this.showOverview();
+			}
+			this.zoomOut = !this.zoomOut;
+		}
+	},
+
+	showOverview: function (){
+		var zoom = new TWEEN.Tween(this.pixiContainer.scale)
+				.to({x: 0.8, y: 0.8}, 800)
+				.start();
+		this.renderer.view.classList.add('zoomOut');
+	},
+
+	hideOverview: function (){
+		var zoom = new TWEEN.Tween(this.pixiContainer.scale)
+				.to({x: 1, y: 1}, 800)
+				.start();
+		this.renderer.view.classList.remove('zoomOut');
 	}
 });

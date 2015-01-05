@@ -170,7 +170,6 @@ _.extend(SelectionManager.prototype, {
 
 		// Unfreeze the cursor.
 		this.cursor.isFrozen = false;
-		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
 	// The event when the player cancels selection by selecting an out-of-range

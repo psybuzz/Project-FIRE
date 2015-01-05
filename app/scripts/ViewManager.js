@@ -15,9 +15,9 @@ function ViewManager (options){
 
 	// Initialize views.
 	this.views = {};
-	this.views[ViewManager.VIEWS.INTRO] = new IntroView({el: '#introContainer'});
-	this.views[ViewManager.VIEWS.MENU] = new MenuView({el: '#menuContainer'});
-	this.views[ViewManager.VIEWS.FIELD] = new FieldView({el: '#fieldContainer'});
+	this.views[ViewManager.VIEWS.INTRO] = new IntroView();
+	this.views[ViewManager.VIEWS.MENU] = new MenuView();
+	this.views[ViewManager.VIEWS.FIELD] = new FieldView();
 }
 
 /**

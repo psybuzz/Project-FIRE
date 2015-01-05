@@ -15,9 +15,9 @@ function ViewManager (options){
 
 	// Initialize views.
 	this.views = {};
-	this.views[ViewManager.VIEWS.INTRO] = new IntroView({el: '#introContainer'});
-	this.views[ViewManager.VIEWS.MENU] = new MenuView({el: '#menuContainer'});
-	this.views[ViewManager.VIEWS.FIELD] = new FieldView({el: '#fieldContainer'});
+	this.views[ViewManager.VIEWS.INTRO] = new IntroView();
+	this.views[ViewManager.VIEWS.MENU] = new MenuView();
+	this.views[ViewManager.VIEWS.FIELD] = new FieldView();
 }
 
 /**
@@ -202,7 +202,7 @@ function Grid (rowN, colN, cellWidth, cellHeight){
 
 			// Normal grid.
 			cellPadding = 12;
-			grid.lineStyle(1, 0x7f8c8d, 1);
+			grid.lineStyle(2, 0x7f8c8d, 1);
 			grid.moveTo(gx + cellPadding, gy);
 			grid.lineTo(gx + cellWidth - cellPadding, gy);
 			grid.moveTo(gx, gy + cellPadding);
@@ -366,6 +366,7 @@ function Circle (x, y, color, radius){
  */
 
 var FieldView = Backbone.View.extend({
+	el: '#fieldContainer',
 	turn: null,
 	allies: [],
 	enemies: [],
@@ -409,12 +410,7 @@ var FieldView = Backbone.View.extend({
 	},
 
 	leaveView: function (newView){
-		var x = new TWEEN.Tween(b)
-				.to({blurX: 50}, 800)
-				.start();
-		x = new TWEEN.Tween(g.pixiContainer)
-				.to({rotation: 0.3, alpha:0}, 800)
-				.start();
+
 	},
 
 	completeTurn: function (){
@@ -445,9 +441,27 @@ var FieldView = Backbone.View.extend({
 		this.selectionManager.update(delta);
 	},
 
+	/**
+	 * The callback that decides what to do after the action menu is closed.
+	 * @param  {Object} e The action menu selection event.
+	 *      @param {Number} action 			The name of the selected option.
+	 *      @param {Array.String} actionSet The set of actions that the player
+	 *                                      chose from.
+	 */
 	onActionMenuClose: function (e){
 		// TODO: Tell the selection manager whether or not the action was an
 		// attack/def, wait, or cancel.
+		if (e.action === 'Wait'){
+
+		} else if (e.action === 'Cancel'){
+
+		} else{
+			// TODO: This branch should probably trigger a 'startBattle' event 
+			// instead of directly calling GridView methods.
+			
+			this.gridView.enterBattleTransition();
+			Audio.playSrc('sounds/fire.mp3');
+		}
 
 		// Let the SelectionManager know to resume grid selection behavior when
 		// the player's selected action has been completed.
@@ -467,7 +481,7 @@ FieldView.TURN = {
  */
 
 var IntroView = Backbone.View.extend({
-	
+	el: '#introContainer',
 });
 
 /**
@@ -475,7 +489,7 @@ var IntroView = Backbone.View.extend({
  */
 
 var MenuView = Backbone.View.extend({
-	
+	el: '#menuContainer',
 });
 
 /**
@@ -488,7 +502,8 @@ var MenuView = Backbone.View.extend({
 var Audio = {
 	audioTags: [
 		document.getElementById('sound1'),
-		document.getElementById('sound2')
+		document.getElementById('sound2'),
+		document.getElementById('sound3'),
 	],
 
 	dynamicTag: document.getElementById('dynamicSound'),
@@ -542,6 +557,7 @@ var Key = {
 		A: 65,
 		S: 83,
 		D: 68,
+		T: 84,
 		BACKSPACE: 8,
 		ENTER: 13,
 		SPACE: 32,
@@ -812,7 +828,7 @@ var ActionMenuView = Backbone.View.extend({
 		this.close(function (){
 			this.trigger('close', {
 				actionSet: ActionSets[this.actionSet],
-				selectedIndex: currIndex
+				action: ActionSets[this.actionSet][currIndex]
 			});
 		}.bind(this));
 	},
@@ -823,6 +839,9 @@ var ActionMenuView = Backbone.View.extend({
 		var optionElements = this.$el.find('.action-option');
 		optionElements.removeClass('selected');
 		optionEl.classList.add('selected');
+
+		// Play a sound.
+		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
 	/**
@@ -855,9 +874,9 @@ var ActionMenuView = Backbone.View.extend({
 // TODO: Move these sets to a different file.
 // Define sets of actions.
 var ActionSets = [
-	['Fire', 'Water', 'Wait', 'Cancel'],
-	['Light', 'Water', 'Wait', 'Cancel'],
-	['Heal', 'Light', 'Wait', 'Cancel']
+	['Wait', 'Fire', 'Water', 'Cancel'],
+	['Wait', 'Light', 'Water', 'Cancel'],
+	['Wait', 'Heal', 'Light', 'Cancel']
 ];
 
 /**
@@ -1002,6 +1021,12 @@ var GridView = Backbone.View.extend({
 		down: window.innerHeight-4 - 50,
 	},
 
+	/**
+	 * Whether or not the grid is zoomed out.
+	 * @type {Boolean}
+	 */
+	zoomOut: false,
+
 	initialize: function (options){
 		options = options || {};
 		this.rowN = options.rowN || 50;
@@ -1013,7 +1038,7 @@ var GridView = Backbone.View.extend({
 		var colors = [0x000000, 0x333333, 0x1abc9c, 0x3498db, 0xf39c12, 
 				0xecf0f1, 0x7f8c8d, 0x95a5a6, 0xffffff, 0x808080];
 		this.stage = new PIXI.Stage(colors[8]);
-		this.pixiContainer = new PIXI.DisplayObjectContainer();
+		this.pixiContainer = this.buildPixiContainer();
 		this.stage.addChild(this.pixiContainer);
 
 		// Setup the PIXI Renderer.
@@ -1023,6 +1048,9 @@ var GridView = Backbone.View.extend({
 
 		// Create a grid model.
 		this.gridModel = new GridModel({rowN: this.rowN, colN: this.colN});
+
+		// Listen for keypress events.
+		this.listenTo(Key, 'keyup', this.onKeyUp);
 	},
 
 	render: function (){
@@ -1034,6 +1062,41 @@ var GridView = Backbone.View.extend({
 		this.selectionManager = new SelectionManager({gridView: this});
 		this.rangeHighlighter = new RangeHighlighter({gridView: this});
 		this.addCharacters();
+	},
+
+	buildPixiContainer: function (){
+		var container = new PIXI.DisplayObjectContainer();
+
+		// Setup PIXI filters.
+		var blurFilter = new PIXI.BlurFilter();
+		blurFilter.blurX = 0;
+		blurFilter.blurY = 0;
+		container.filters = [blurFilter];
+		
+		// Store filters.
+		this.filters = {
+			'blur': blurFilter
+		};
+
+		return container;
+	},
+
+	enterBattleTransition: function (){
+		var blurTransition = new TWEEN.Tween(this.filters.blur)
+				.to({blurX: 64}, 800)
+				.start();
+		var rotateTransition = new TWEEN.Tween(this.pixiContainer)
+				.to({rotation: 0.3, alpha: 0}, 800)
+				.start();
+	},
+
+	exitBattleTransition: function (){
+		var blurTransition = new TWEEN.Tween(this.filters.blur)
+				.to({blurX: 0}, 800)
+				.start();
+		var rotateTransition = new TWEEN.Tween(this.pixiContainer)
+				.to({rotation: 0, alpha: 1}, 800)
+				.start();
 	},
 
 	addCharacters: function (){
@@ -1124,6 +1187,31 @@ var GridView = Backbone.View.extend({
 
 	onResize: function (){
 		this.renderer.resize(window.innerWidth, window.innerHeight);
+	},
+
+	onKeyUp: function (e){
+		if (Key.matches(e.keyCode, ['T'])){
+			if (this.zoomOut){
+				this.hideOverview();
+			} else {
+				this.showOverview();
+			}
+			this.zoomOut = !this.zoomOut;
+		}
+	},
+
+	showOverview: function (){
+		var zoom = new TWEEN.Tween(this.pixiContainer.scale)
+				.to({x: 0.8, y: 0.8}, 800)
+				.start();
+		this.renderer.view.classList.add('zoomOut');
+	},
+
+	hideOverview: function (){
+		var zoom = new TWEEN.Tween(this.pixiContainer.scale)
+				.to({x: 1, y: 1}, 800)
+				.start();
+		this.renderer.view.classList.remove('zoomOut');
 	}
 });
 
@@ -1436,7 +1524,6 @@ _.extend(SelectionManager.prototype, {
 
 		// Unfreeze the cursor.
 		this.cursor.isFrozen = false;
-		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
 	// The event when the player cancels selection by selecting an out-of-range

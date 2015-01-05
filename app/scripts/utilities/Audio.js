@@ -8,7 +8,8 @@
 var Audio = {
 	audioTags: [
 		document.getElementById('sound1'),
-		document.getElementById('sound2')
+		document.getElementById('sound2'),
+		document.getElementById('sound3'),
 	],
 
 	dynamicTag: document.getElementById('dynamicSound'),

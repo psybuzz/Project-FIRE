@@ -108,7 +108,7 @@ var ActionMenuView = Backbone.View.extend({
 		this.close(function (){
 			this.trigger('close', {
 				actionSet: ActionSets[this.actionSet],
-				selectedIndex: currIndex
+				action: ActionSets[this.actionSet][currIndex]
 			});
 		}.bind(this));
 	},
@@ -119,6 +119,9 @@ var ActionMenuView = Backbone.View.extend({
 		var optionElements = this.$el.find('.action-option');
 		optionElements.removeClass('selected');
 		optionEl.classList.add('selected');
+
+		// Play a sound.
+		Audio.playSrc('sounds/click3.wav', 0.3);
 	},
 
 	/**
@@ -151,7 +154,7 @@ var ActionMenuView = Backbone.View.extend({
 // TODO: Move these sets to a different file.
 // Define sets of actions.
 var ActionSets = [
-	['Fire', 'Water', 'Wait', 'Cancel'],
-	['Light', 'Water', 'Wait', 'Cancel'],
-	['Heal', 'Light', 'Wait', 'Cancel']
+	['Wait', 'Fire', 'Water', 'Cancel'],
+	['Wait', 'Light', 'Water', 'Cancel'],
+	['Wait', 'Heal', 'Light', 'Cancel']
 ];

@@ -52,8 +52,11 @@ body {
 }
 
 #fieldContainer canvas{
-    /*transform: rotateX(18deg);*/
-    transition: 0.2s ease transform;
+    transition: 0.6s ease transform;
+}
+
+#fieldContainer canvas.zoomOut{
+    transform: rotateX(18deg) scale(0.9);
 }
 
 #actionMenuContainer{
@@ -62,6 +65,7 @@ body {
     top: 80px;
     left: 0px;
     width: 50%;
+    z-index: 2;
 }
 
 #actionMenuContainer .action-menu{

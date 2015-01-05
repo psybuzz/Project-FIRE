@@ -9,6 +9,7 @@
  */
 
 var FieldView = Backbone.View.extend({
+	el: '#fieldContainer',
 	turn: null,
 	allies: [],
 	enemies: [],
@@ -52,12 +53,7 @@ var FieldView = Backbone.View.extend({
 	},
 
 	leaveView: function (newView){
-		var x = new TWEEN.Tween(b)
-				.to({blurX: 50}, 800)
-				.start();
-		x = new TWEEN.Tween(g.pixiContainer)
-				.to({rotation: 0.3, alpha:0}, 800)
-				.start();
+
 	},
 
 	completeTurn: function (){
@@ -88,9 +84,27 @@ var FieldView = Backbone.View.extend({
 		this.selectionManager.update(delta);
 	},
 
+	/**
+	 * The callback that decides what to do after the action menu is closed.
+	 * @param  {Object} e The action menu selection event.
+	 *      @param {Number} action 			The name of the selected option.
+	 *      @param {Array.String} actionSet The set of actions that the player
+	 *                                      chose from.
+	 */
 	onActionMenuClose: function (e){
 		// TODO: Tell the selection manager whether or not the action was an
 		// attack/def, wait, or cancel.
+		if (e.action === 'Wait'){
+
+		} else if (e.action === 'Cancel'){
+
+		} else{
+			// TODO: This branch should probably trigger a 'startBattle' event 
+			// instead of directly calling GridView methods.
+			
+			this.gridView.enterBattleTransition();
+			Audio.playSrc('sounds/fire.mp3');
+		}
 
 		// Let the SelectionManager know to resume grid selection behavior when
 		// the player's selected action has been completed.
